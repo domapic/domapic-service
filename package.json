@@ -3,8 +3,7 @@
   "version": "0.1.0-alpha.1",
   "description": "Base for domapic Node.js services",
   "main": "index.js",
-  "keywords": [
-  ],
+  "keywords": [],
   "scripts": {
     "test": "./node_modules/istanbul/lib/cli.js cover ./node_modules/.bin/_mocha -- --recursive test"
   },
