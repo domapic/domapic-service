@@ -10,7 +10,7 @@ const Service = function (serviceOptions) {
   return new microService.Service(options.extendWith(serviceOptions)).then((service) => {
     const serviceHandler = new ServiceHandler(service)
     return Promise.all([
-      serviceHandler.addBaseApi(),
+      serviceHandler.addConnectionApi(),
       serviceHandler.addSecurity()
     ]).then(() => {
       return Promise.resolve(serviceHandler.publicMethods)
