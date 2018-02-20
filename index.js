@@ -11,6 +11,7 @@ const Service = function (serviceOptions) {
     const serviceHandler = new ServiceHandler(service)
     return Promise.all([
       serviceHandler.addConnectionApi(),
+      serviceHandler.addSecurityApi(),
       serviceHandler.addSecurity()
     ]).then(() => {
       return Promise.resolve(serviceHandler.publicMethods)
