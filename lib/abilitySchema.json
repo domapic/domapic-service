@@ -1,6 +1,9 @@
 {
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string"
+    },
     "data": {
       "type": "object",
       "oneOf": [{
@@ -110,11 +113,11 @@
     }
   },
   "anyOf": [{
-    "required": ["data", "event"]
+    "required": ["description", "data", "event"]
   }, {
-    "required": ["data", "command"]
+    "required": ["description", "data", "command"]
   }, {
-    "required": ["data", "state"]
+    "required": ["description", "data", "state"]
   }],
   "additionalProperties": false
 }
