@@ -1,0 +1,120 @@
+{
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "object",
+      "oneOf": [{
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["string"]
+          },
+          "enum": {
+            "type": "array"
+          },
+          "minLength": {
+            "type": "number"
+          },
+          "maxLength": {
+            "type": "number"
+          },
+          "pattern": {
+            "type": "string"
+          },
+          "format": {
+            "type": "string",
+            "enum": ["date-time", "email", "hostname", "ipv4", "ipv6", "uri"]
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      }, {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["number", "integer", "float"]
+          },
+          "enum": {
+            "type": "array"
+          },
+          "multipleOf": {
+            "type": "number"
+          },
+          "minimum": {
+            "type": "number"
+          },
+          "maximum": {
+            "type": "number"
+          },
+          "exclusiveMaximum": {
+            "type": "boolean"
+          },
+          "exclusiveMinimum": {
+            "type": "boolean"
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      }, {
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["boolean"]
+          }
+        },
+        "required": ["type"],
+        "additionalProperties": false
+      }]
+    },
+    "event": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": ["description"],
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "auth": {
+          "type": "boolean"
+        },
+        "handler": {
+          "format": "isFunction"
+        }
+      },
+      "required": ["description", "handler"],
+      "additionalProperties": false
+    },
+    "command": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "auth": {
+          "type": "boolean"
+        },
+        "handler": {
+          "format": "isFunction"
+        }
+      },
+      "required": ["description", "handler"],
+      "additionalProperties": false
+    }
+  },
+  "anyOf": [{
+    "required": ["data", "event"]
+  }, {
+    "required": ["data", "command"]
+  }, {
+    "required": ["data", "state"]
+  }],
+  "additionalProperties": false
+}
