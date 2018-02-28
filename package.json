@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "bluebird": "3.5.1",
-    "domapic-microservice": "0.3.1",
+    "domapic-microservice": "0.4.0",
     "lodash": "4.17.4",
     "rand-token": "0.4.0",
     "jsonschema": "1.2.2"
