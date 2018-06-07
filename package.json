@@ -1,30 +1,43 @@
 {
   "name": "domapic-service",
-  "version": "0.1.0-alpha.1",
-  "description": "Base for domapic Node.js services",
+  "version": "1.0.0-alpha.1",
+  "description": "Base for Domapic Node.js services",
   "main": "index.js",
-  "keywords": [],
+  "keywords": [
+    "domotic",
+    "api",
+    "openapi",
+    "openapi3",
+    "service",
+    "error-handling",
+    "ssl",
+    "server",
+    "authentication",
+    "jwt",
+    "apiKey",
+    "client",
+    "tracer",
+    "cli",
+    "commandline-interface",
+    "process manager",
+    "swagger-ui"
+  ],
   "scripts": {
-    "test": "./node_modules/istanbul/lib/cli.js cover ./node_modules/.bin/_mocha -- --recursive test"
+    "test": "narval"
   },
   "dependencies": {
     "bluebird": "3.5.1",
-    "domapic-microservice": "0.4.0",
-    "lodash": "4.17.4",
+    "domapic-base": "1.0.0-beta.1",
+    "lodash": "4.17.10",
     "rand-token": "0.4.0",
-    "jsonschema": "1.2.2"
+    "jsonschema": "1.2.4"
   },
   "devDependencies": {
-    "istanbul": "0.4.5",
-    "mocha": "4.0.1"
-  },
-  "engines": {
-    "node": "8.9.1",
-    "npm": "5.6.0"
+    "narval": "1.1.0"
   },
   "author": {
     "name": "Javier Brea",
-    "url": "http://javierbrea.com"
+    "url": "https://javierbrea.com"
   },
   "homepage": "http://domapic.com",
   "license": "MIT",

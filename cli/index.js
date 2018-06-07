@@ -1,11 +1,11 @@
 'use strict'
 
-const microService = require('domapic-microservice')
+const domapic = require('domapic-base')
 
 const options = require('./lib/options')
 
 const cli = function (cliOptions) {
-  microService.cli(options.extend(cliOptions))
+  domapic.cli(options.extend(cliOptions))
 }
 
 module.exports = cli
