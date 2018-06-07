@@ -6,4 +6,9 @@ package-lock.json
 /.test
 /.narval
 /.coverage
-
+/.github
+/test
+.gitignore
+.narval.yml
+.travis.yml
+sonar-project.properties

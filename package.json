@@ -23,7 +23,8 @@
     "swagger-ui"
   ],
   "scripts": {
-    "test": "narval"
+    "test": "narval",
+    "coveralls": "cat ./.coverage/unit/lcov.info | coveralls"
   },
   "dependencies": {
     "bluebird": "3.5.1",
@@ -33,6 +34,7 @@
     "jsonschema": "1.2.4"
   },
   "devDependencies": {
+    "coveralls": "3.0.1",
     "narval": "1.1.0"
   },
   "author": {
