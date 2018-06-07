@@ -1,13 +1,13 @@
 'use strict'
 
 const Promise = require('bluebird')
-const microService = require('domapic-microservice')
+const domapic = require('domapic-base')
 
 const options = require('./lib/options')
 const ServiceHandler = require('./lib/ServiceHandler')
 
 const Service = function (serviceOptions) {
-  return new microService.Service(options.extendWith(serviceOptions)).then((service) => {
+  return new domapic.Service(options.extendWith(serviceOptions)).then((service) => {
     const serviceHandler = new ServiceHandler(service)
     return Promise.all([
       serviceHandler.addConnectionApi(),
@@ -19,4 +19,6 @@ const Service = function (serviceOptions) {
   })
 }
 
-module.exports = Service
+module.exports = {
+  Service: Service
+}
