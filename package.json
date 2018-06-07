@@ -33,6 +33,7 @@
     "jsonschema": "1.2.4"
   },
   "devDependencies": {
+    "coveralls": "3.0.1",
     "narval": "1.1.0"
   },
   "author": {
