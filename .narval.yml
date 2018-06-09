@@ -59,7 +59,6 @@ suites:
           abort-on-error: true
           local:
             command: test/integration/commands/start-service.sh
-            wait-on: tcp:localhost:3000
             env:
               controller_host_name: localhost
               service_port: 3100
@@ -68,18 +67,60 @@ suites:
           docker:
             container: service-container
             command: test/integration/commands/start-service.sh
-            wait-on: tcp:controller-container:3000
             env:
               controller_host_name: domapic-controller
               service_port: 3000
               service_host_name: service-container
               domapic_path: .shared
       test:
-        specs: test/integration/specs
+        specs: test/integration/specs/no-controller-api-key.specs.js
         local:
           wait-on: tcp:localhost:3100
         docker:
           container: test-container
           wait-on: tcp:service-container:3000
+      coverage:
+        enabled: false
+    - name: auth-api
+      describe: should add or remove api keys
+      before:
+        local:
+          command: test/integration/commands/clean.sh
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            command: test/integration/commands/start-service.sh
+            env:
+              controller_host_name: localhost
+              service_port: 3100
+              service_host_name: localhost
+              domapic_path: .test
+          docker:
+            container: service-container
+            command: test/integration/commands/start-service.sh
+            env:
+              controller_host_name: domapic-controller
+              service_port: 3000
+              service_host_name: service-container
+              domapic_path: .shared
+              service_extra_options: --authDisabled=172.0.0.0/8
+      test:
+        specs: test/integration/specs/auth-api.specs.js
+        local:
+          wait-on: tcp:localhost:3100
+          env:
+            controller_host_name: localhost
+            service_port: 3100
+            service_host_name: localhost
+            domapic_path: .test
+        docker:
+          container: test-container
+          wait-on: tcp:service-container:3000
+          env:
+            controller_host_name: domapic-controller
+            service_port: 3000
+            service_host_name: service-container
+            domapic_path: .shared
       coverage:
         enabled: false
