@@ -1,3 +1,33 @@
+docker-images:
+  - name: node-image
+    from: node:8.11.1
+    expose:
+      - 3000
+    add:
+      - package.json
+    install: test/integration/commands/install.sh
+docker-containers:
+  - name: controller-container
+    build: node-image
+    bind:
+      - lib
+      - test
+      - cli
+      - index.js
+  - name: service-container
+    build: node-image
+    bind:
+      - lib
+      - test
+      - cli
+      - index.js
+  - name: test-container
+    build: node-image
+    bind:
+      - lib
+      - test
+      - cli
+      - index.js
 suites:
   unit:
     - name: unit 
@@ -6,3 +36,50 @@ suites:
       coverage:
         config:
           dir: .coverage/unit
+  integration:
+    - name: no-controller-provided
+      describe: should print an api key valid to launch a pairing command from controller
+      before:
+        local:
+          command: test/integration/commands/clean.sh
+      services:
+        - name: domapic-controller
+          local:
+            command: test/integration/commands/start-controller.sh
+            env:
+              controller_host_name: localhost
+              domapic_path: .test
+          docker:
+            container: controller-container
+            command: test/integration/commands/start-controller.sh
+            env:
+              controller_host_name: controller-container
+              domapic_path: .shared
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            command: test/integration/commands/start-service.sh
+            wait-on: tcp:localhost:3000
+            env:
+              controller_host_name: localhost
+              service_port: 3100
+              service_host_name: localhost
+              domapic_path: .test
+          docker:
+            container: service-container
+            command: test/integration/commands/start-service.sh
+            wait-on: tcp:controller-container:3000
+            env:
+              controller_host_name: domapic-controller
+              service_port: 3000
+              service_host_name: service-container
+              domapic_path: .shared
+      test:
+        specs: test/integration/specs
+        local:
+          wait-on: tcp:localhost:3100
+        docker:
+          container: test-container
+          wait-on: tcp:service-container:3000
+      coverage:
+        enabled: false

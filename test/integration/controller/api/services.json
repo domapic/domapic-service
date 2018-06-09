@@ -1,0 +1,207 @@
+{
+  "tags": [{
+    "name": "service",
+    "description": "Domapic services"
+  }],
+  "components": {
+    "schemas": {
+      "Service": {
+        "description": "Service info",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Id of the service",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the service",
+            "type": "string"
+          },
+          "type": {
+            "description": "Service type",
+            "type": "string",
+            "enum": ["plugin", "service"]
+          },
+          "package": {
+            "description": "Package name",
+            "type": "string"
+          },
+          "version": {
+            "description": "Package version",
+            "type": "string"
+          },
+          "description": {
+            "description": "Package description",
+            "type": "string"
+          },
+          "apiKey": {
+            "description": "Api key for the controller to be used in connections with the service",
+            "type": "string"
+          }
+        },
+        "required": ["name", "id"],
+        "additionalProperties": false,
+        "example": {
+          "id": "foo-random-id",
+          "name": "foo-instance-name",
+          "type": "service",
+          "package": "foo-package-name",
+          "version": "1.0.0",
+          "description": "Foo microservice package"
+        }
+      }
+    }
+  },
+  "paths": {
+    "/services": {
+      "get": {
+        "tags": ["service"],
+        "summary": "Returns services",
+        "description": "Returns services",
+        "operationId": "getServices",
+        "responses": {
+          "200": {
+            "description": "services",
+            "content": {
+              "application/json": {
+                "type": "array",
+                "items" : {
+                  "schema" : {
+                    "$ref": "#/components/schemas/Service"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["service"],
+        "summary": "Register new service",
+        "description": "Add service",
+        "operationId": "addService",
+        "requestBody": {
+          "description": "Service to be added",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Service"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Service added"
+          }
+        }
+      }
+    },
+    "/services/example/events/console": {
+      "post": {
+        "tags": ["service"],
+        "summary": "Register new service",
+        "description": "Add service",
+        "operationId": "consoleEvent",
+        "requestBody": {
+          "description": "Service to be added",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "data": {
+                    "type": "string"
+                  }
+                },
+                "required": ["data"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Event registered"
+          }
+        }
+      }
+    },
+     "/services/example": {
+      "get": {
+        "tags": ["service"],
+        "summary": "Return service",
+        "description": "Returns service",
+        "operationId": "getService",
+        "responses": {
+          "200": {
+            "description": "services",
+            "content": {
+              "application/json": {
+                "schema" : {
+                  "$ref": "#/components/schemas/Service"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": ["service"],
+        "summary": "Update service",
+        "description": "Update service",
+        "operationId": "patchService",
+        "requestBody": {
+          "description": "Service fields to be updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Service info",
+                "type": "object",
+                "properties": {
+                  "package": {
+                    "description": "Package name",
+                    "type": "string"
+                  },
+                  "version": {
+                    "description": "Package version",
+                    "type": "string"
+                  },
+                  "description": {
+                    "description": "Package description",
+                    "type": "string"
+                  },
+                  "apiKey": {
+                    "description": "Api key for the controller to be used in connections with the service",
+                    "type": "string"
+                  }
+                },
+                "additionalProperties": false,
+                "example": {
+                  "package": "foo-package-name",
+                  "version": "1.0.0",
+                  "description": "Foo microservice package"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "services",
+            "content": {
+              "application/json": {
+                "schema" : {
+                  "$ref": "#/components/schemas/Service"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
