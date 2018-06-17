@@ -147,14 +147,14 @@ suites:
             <<: *local-controller
             env:
               <<: *local-controller-env
-              get-abilities-handler: update
-              get-service-handler: exists
+              get_abilities_handler: update
+              get_service_handler: exists
           docker:
             <<: *docker-controller
             env:
               <<: *docker-controller-env
-              get-abilities-handler: update
-              get-service-handler: exists
+              get_abilities_handler: update
+              get_service_handler: exists
         - name: domapic-service
           abort-on-error: true
           local:
@@ -182,12 +182,12 @@ suites:
             <<: *local-controller
             env:
               <<: *local-controller-env
-              get-service-handler: exists-different-id
+              get_service_handler: exists-different-id
           docker:
             <<: *docker-controller
             env:
               <<: *docker-controller-env
-              get-service-handler: exists-different-id
+              get_service_handler: exists-different-id
         - name: domapic-service
           abort-on-error: true
           local:

@@ -7,6 +7,13 @@ const _ = require('lodash')
 
 const fixtures = require('./fixtures.js')
 
+const getHandlerKey = function (handlerKey) {
+  if (!_.isUndefined(handlerKey) && handlerKey !== '') {
+    return process.env[handlerKey]
+  }
+  return null
+}
+
 const Mocks = function (service) {
   const handlers = {
     getServices: {
@@ -77,7 +84,7 @@ const Mocks = function (service) {
   const GetOperation = function (actionName, handlerKey) {
     return function () {
       const operation = {
-        handler: handlers[actionName][process.env[handlerKey] || _.keys(handlers[actionName])[0]]
+        handler: handlers[actionName][getHandlerKey(handlerKey) || _.keys(handlers[actionName])[0]]
       }
       const parser = parsers[actionName]
 
@@ -90,13 +97,13 @@ const Mocks = function (service) {
   }
 
   return {
-    getServices: new GetOperation('getServices', 'get-services-handler'),
-    getService: new GetOperation('getService', 'get-service-handler'),
-    updateService: new GetOperation('updateService', 'update-service-handler'),
-    addService: new GetOperation('addService', 'add-service-handler'),
-    getAbilities: new GetOperation('getAbilities', 'get-abilities-handler'),
-    addAbility: new GetOperation('addAbility', 'add-ability-handler'),
-    updateAbility: new GetOperation('updateAbility', 'update-ability-handler')
+    getServices: new GetOperation('getServices', 'get_services_handler'),
+    getService: new GetOperation('getService', 'get_service_handler'),
+    updateService: new GetOperation('updateService', 'update_service_handler'),
+    addService: new GetOperation('addService', 'add_service_handler'),
+    getAbilities: new GetOperation('getAbilities', 'get_abilities_handler'),
+    addAbility: new GetOperation('addAbility', 'add_ability_handler'),
+    updateAbility: new GetOperation('updateAbility', 'update_ability_handler')
   }
 }
 
