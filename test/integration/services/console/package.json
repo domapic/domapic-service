@@ -2,17 +2,10 @@
   "name": "console-domapic",
   "version": "1.0.0",
   "description": "Example of Node.js Domapic service",
-  "main": "server.js",
   "scripts": {
     "console": "./bin/console"
   },
   "dependencies": {
     "domapic-service": "file:../../../../"
-  },
-  "author": {
-    "name": "Javier Brea",
-    "url": "https://javierbrea.com"
-  },
-  "homepage": "http://domapic.com",
-  "license": "MIT"
+  }
 }

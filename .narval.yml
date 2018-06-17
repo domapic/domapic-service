@@ -1,3 +1,65 @@
+schemas:
+  envs:
+    local-service: &local-service-env
+      controller_host_name: localhost
+      service_port: 3100
+      service_host_name: localhost
+      domapic_path: .test
+    docker-service: &docker-service-env
+      controller_host_name: controller-container
+      service_port: 3000
+      service_host_name: service-container
+      domapic_path: .shared
+      service_extra_options: --authDisabled=172.0.0.0/8
+    local-controller: &local-controller-env
+      controller_host_name: localhost
+      domapic_path: .test
+    docker-controller: &docker-controller-env
+      controller_host_name: controller-container
+      domapic_path: .shared
+      controller_extra_options: --authDisabled=172.0.0.0/8 --logLevel=debug
+  bind: &bind
+    - lib
+    - test
+    - cli
+    - index.js
+  integration:
+    clean: &clean
+      local:
+        command: test/integration/commands/clean.sh
+      docker:
+        down-volumes: true
+    coverage: &integration-coverage
+      enabled: false
+    services:
+      local-service: &local-service
+        command: test/integration/commands/start-service.sh
+        env: *local-service-env
+      local-service-wait: &local-service-wait
+        <<: *local-service
+        wait-on: tcp:localhost:3000
+      docker-service: &docker-service
+        container: service-container
+        command: test/integration/commands/start-service.sh
+        env: *docker-service-env
+      docker-service-wait: &docker-service-wait
+        <<: *docker-service
+        wait-on: tcp:controller-container:3000
+      local-controller: &local-controller
+        command: test/integration/commands/start-controller.sh
+        env: *local-controller-env
+      docker-controller: &docker-controller
+        container: controller-container
+        command: test/integration/commands/start-controller.sh
+        env: *docker-controller-env
+    test: &integration-test
+      local:
+        wait-on: tcp:localhost:3100
+        env: *local-service-env
+      docker:
+        container: test-container
+        wait-on: tcp:service-container:3000
+        env: *docker-service-env
 docker-images:
   - name: node-image
     from: node:8.11.1
@@ -9,25 +71,13 @@ docker-images:
 docker-containers:
   - name: controller-container
     build: node-image
-    bind:
-      - lib
-      - test
-      - cli
-      - index.js
+    bind: *bind
   - name: service-container
     build: node-image
-    bind:
-      - lib
-      - test
-      - cli
-      - index.js
+    bind: *bind
   - name: test-container
     build: node-image
-    bind:
-      - lib
-      - test
-      - cli
-      - index.js
+    bind: *bind
 suites:
   unit:
     - name: unit 
@@ -39,47 +89,120 @@ suites:
   integration:
     - name: no-controller-provided
       describe: should print an api key valid to launch a pairing command from controller
-      before:
-        local:
-          command: test/integration/commands/clean.sh
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local: *local-service
+          docker: *docker-service
+      test:
+        <<: *integration-test
+        specs:
+          - test/integration/specs/no-controller-api-key.specs.js
+          - test/integration/specs/not-connected.specs.js
+      coverage: *integration-coverage
+    - name: auth-api
+      describe: should add or remove api keys
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local: *local-service
+          docker: *docker-service
+      test:
+        <<: *integration-test
+        specs: test/integration/specs/auth-api.specs.js
+      coverage: *integration-coverage
+    - name: controller-register
+      describe: should register the service in controller when started 
+      before: *clean
       services:
         - name: domapic-controller
-          local:
-            command: test/integration/commands/start-controller.sh
-            env:
-              controller_host_name: localhost
-              domapic_path: .test
-          docker:
-            container: controller-container
-            command: test/integration/commands/start-controller.sh
-            env:
-              controller_host_name: controller-container
-              domapic_path: .shared
+          local: *local-controller
+          docker: *docker-controller
         - name: domapic-service
           abort-on-error: true
           local:
-            command: test/integration/commands/start-service.sh
-            wait-on: tcp:localhost:3000
+            <<: *local-service-wait
             env:
-              controller_host_name: localhost
-              service_port: 3100
-              service_host_name: localhost
-              domapic_path: .test
+              <<: *local-service-env
+              service_extra_options: --controller=http://localhost:3000 --logLevel=debug
           docker:
-            container: service-container
-            command: test/integration/commands/start-service.sh
-            wait-on: tcp:controller-container:3000
+            <<: *docker-service-wait
             env:
-              controller_host_name: domapic-controller
-              service_port: 3000
-              service_host_name: service-container
-              domapic_path: .shared
+              <<: *docker-service-env
+              service_extra_options: --controller=http://controller-container:3000 --logLevel=debug
       test:
-        specs: test/integration/specs
-        local:
-          wait-on: tcp:localhost:3100
-        docker:
-          container: test-container
-          wait-on: tcp:service-container:3000
-      coverage:
-        enabled: false
+        <<: *integration-test
+        specs:
+          - test/integration/specs/controller-register.specs.js
+          - test/integration/specs/connected.specs.js
+      coverage: *integration-coverage
+    - name: update-abilities
+      describe: should update abilities in controller when have changed
+      before: *clean
+      services:
+        - name: domapic-controller
+          local:
+            <<: *local-controller
+            env:
+              <<: *local-controller-env
+              get_abilities_handler: update
+              get_service_handler: exists
+          docker:
+            <<: *docker-controller
+            env:
+              <<: *docker-controller-env
+              get_abilities_handler: update
+              get_service_handler: exists
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-wait
+            env:
+              <<: *local-service-env
+              service_extra_options: --controller=http://localhost:3000 --logLevel=debug
+          docker:
+            <<: *docker-service-wait
+            env:
+              <<: *docker-service-env
+              service_extra_options: --controller=http://controller-container:3000 --logLevel=debug
+      test:
+        <<: *integration-test
+        specs:
+          - test/integration/specs/update-abilities.specs.js
+          - test/integration/specs/connected.specs.js
+      coverage: *integration-coverage
+    - name: name-already-exists
+      describe: should reject connection to controller when another registered service has the same name
+      before: *clean
+      services:
+        - name: domapic-controller
+          local:
+            <<: *local-controller
+            env:
+              <<: *local-controller-env
+              get_service_handler: exists-different-id
+          docker:
+            <<: *docker-controller
+            env:
+              <<: *docker-controller-env
+              get_service_handler: exists-different-id
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-wait
+            env:
+              <<: *local-service-env
+              service_extra_options: --controller=http://localhost:3000 --logLevel=debug
+          docker:
+            <<: *docker-service-wait
+            env:
+              <<: *docker-service-env
+              service_extra_options: --controller=http://controller-container:3000 --logLevel=debug
+      test:
+        <<: *integration-test
+        specs: 
+          - test/integration/specs/name-already-exists.specs.js
+          - test/integration/specs/not-connected.specs.js
+      coverage: *integration-coverage
