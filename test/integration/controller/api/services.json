@@ -39,7 +39,6 @@
             "type": "string"
           }
         },
-        "required": ["name", "id"],
         "additionalProperties": false,
         "example": {
           "id": "foo-random-id",
@@ -49,6 +48,129 @@
           "version": "1.0.0",
           "description": "Foo microservice package"
         }
+      },
+      "NewService": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Service"
+          },
+          {
+            "required": ["name", "id"]
+          }
+        ]
+      },
+      "Ability": {
+        "description": "Ability info",
+        "type": "object",
+        "properties": {
+          "id": {
+            "description": "Id of the ability",
+            "type": "integer"
+          },
+          "service": {
+            "description": "Id of the service owner of the ability",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["event", "command", "state"]
+          },
+          "deprecated": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "oneOf": [{
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["string"]
+                },
+                "enum": {
+                  "type": "array"
+                },
+                "minLength": {
+                  "type": "number"
+                },
+                "maxLength": {
+                  "type": "number"
+                },
+                "pattern": {
+                  "type": "string"
+                },
+                "format": {
+                  "type": "string",
+                  "enum": ["date-time", "email", "hostname", "ipv4", "ipv6", "uri"]
+                }
+              },
+              "required": ["type"],
+              "additionalProperties": false
+            }, {
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["number", "integer", "float"]
+                },
+                "enum": {
+                  "type": "array"
+                },
+                "multipleOf": {
+                  "type": "number"
+                },
+                "minimum": {
+                  "type": "number"
+                },
+                "maximum": {
+                  "type": "number"
+                },
+                "exclusiveMaximum": {
+                  "type": "boolean"
+                },
+                "exclusiveMinimum": {
+                  "type": "boolean"
+                }
+              },
+              "required": ["type"],
+              "additionalProperties": false
+            }, {
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["boolean"]
+                }
+              },
+              "required": ["type"],
+              "additionalProperties": false
+            }]
+          }
+        },
+        "additionalProperties": false,
+        "example": {
+          "service": "fsr13242gerasdg43erg2323efg",
+          "name": "foo-ability",
+          "description": "Foo service ability",
+          "type": "command",
+          "data": {
+            "type": "string",
+            "minLength": 45
+          }
+        }
+      },
+      "NewAbility": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Ability"
+          },
+          {
+            "required": ["service", "data", "description", "name", "type"]
+          }
+        ]
       }
     }
   },
@@ -86,7 +208,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Service"
+                "$ref": "#/components/schemas/NewService"
               }
             }
           }
@@ -98,48 +220,29 @@
         }
       }
     },
-    "/services/example/events/console": {
-      "post": {
-        "tags": ["service"],
-        "summary": "Register new service",
-        "description": "Add service",
-        "operationId": "consoleEvent",
-        "requestBody": {
-          "description": "Service to be added",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "data": {
-                    "type": "string"
-                  }
-                },
-                "required": ["data"],
-                "additionalProperties": false
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Event registered"
-          }
-        }
-      }
-    },
-     "/services/example": {
+    "/services/{service}": {
       "get": {
         "tags": ["service"],
-        "summary": "Return service",
-        "description": "Returns service",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "service",
+            "schema": {
+              "type": "string",
+              "required": "true",
+              "description": "Service name"
+            }
+          }
+        ],
+        "summary": "Returns service",
+        "description": "Returns all data about a service",
         "operationId": "getService",
         "responses": {
           "200": {
-            "description": "services",
+            "description": "service",
             "content": {
               "application/json": {
+                "type": "object",
                 "schema" : {
                   "$ref": "#/components/schemas/Service"
                 }
@@ -150,52 +253,140 @@
       },
       "patch": {
         "tags": ["service"],
-        "summary": "Update service",
-        "description": "Update service",
-        "operationId": "patchService",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "service",
+            "schema": {
+              "type": "string",
+              "required": "true",
+              "description": "Service name"
+            }
+          }
+        ],
+        "summary": "Update service field",
+        "description": "Update a service field, and returns all new data about the service",
+        "operationId": "updateService",
         "requestBody": {
-          "description": "Service fields to be updated",
+          "description": "Fields to be updated",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "description": "Service info",
-                "type": "object",
-                "properties": {
-                  "package": {
-                    "description": "Package name",
-                    "type": "string"
-                  },
-                  "version": {
-                    "description": "Package version",
-                    "type": "string"
-                  },
-                  "description": {
-                    "description": "Package description",
-                    "type": "string"
-                  },
-                  "apiKey": {
-                    "description": "Api key for the controller to be used in connections with the service",
-                    "type": "string"
-                  }
-                },
-                "additionalProperties": false,
-                "example": {
-                  "package": "foo-package-name",
-                  "version": "1.0.0",
-                  "description": "Foo microservice package"
-                }
+                "$ref": "#/components/schemas/Service"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "services",
+            "description": "service",
             "content": {
               "application/json": {
+                "type": "object",
                 "schema" : {
                   "$ref": "#/components/schemas/Service"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/services/{service}/abilities": {
+      "get": {
+        "tags": ["service", "abilities"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "service",
+            "schema": {
+              "type": "string",
+              "required": "true",
+              "description": "Service name owner of the abilities"
+            }
+          }
+        ],
+        "summary": "Returns service abilities",
+        "description": "Returns all abilities of a given service",
+        "operationId": "getAbilities",
+        "responses": {
+          "200": {
+            "description": "abilities",
+            "content": {
+              "application/json": {
+                "type": "object",
+                "items" : {
+                  "schema" : {
+                    "$ref": "#/components/schemas/Ability"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/abilities": {
+      "post": {
+        "tags": ["abilities"],
+        "summary": "Register new ability",
+        "description": "Add ability",
+        "operationId": "addAbility",
+        "requestBody": {
+          "description": "Ability to be added",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewAbility"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Ability added"
+          }
+        }
+      }
+    },
+    "/abilities/{id}": {
+      "patch": {
+        "tags": ["abilities"],
+        "summary": "Update ability",
+        "description": "Update ability",
+        "operationId": "updateAbility",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "integer",
+              "required": "true",
+              "description": "Id of the ability to be updated"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Fields to be updated",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ability"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Ability updated",
+            "content": {
+              "application/json": {
+                "type": "object",
+                "schema" : {
+                  "$ref": "#/components/schemas/Ability"
                 }
               }
             }

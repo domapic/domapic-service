@@ -28,11 +28,11 @@ const ReadLogs = function (fileName = 'combined-outerr') {
   }
 }
 
-const waitOnestimatedStartTime = function () {
+const waitOnestimatedStartTime = function (time = ESTIMATED_START_TIME) {
   return new Promise(resolve => {
     setTimeout(() => {
       resolve()
-    }, ESTIMATED_START_TIME)
+    }, time)
   })
 }
 

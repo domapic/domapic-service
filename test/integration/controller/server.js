@@ -2,51 +2,23 @@
 
 const path = require('path')
 
+const _ = require('lodash')
 const domapic = require('domapic-base')
 
 const servicesApi = require('./api/services.json')
-const mocks = require('./api/mocks.js')
+const Mocks = require('./api/mocks.js')
 
 new domapic.Service({
   packagePath: path.resolve(__dirname)
 }).then((service) => {
+  const mocks = new Mocks(service)
   return service.server.extendOpenApi(servicesApi)
     .then(() => {
-      return service.server.addOperations({
-        getServices: {
-          handler: () => {
-            return Promise.resolve(mocks.services)
-          }
-        },
-        getService: {
-          handler: () => {
-            return Promise.resolve(mocks.service)
-            // return Promise.reject(new Error())
-          }
-        },
-        addService: {
-          handler: (params, body, res) => {
-            res.status(201)
-            res.header('location', '/services/example')
-            return Promise.resolve({
-              apiKey: 'customApiKeyForService2'
-            })
-            // return Promise.reject(new service.errors.NotFound('Testing not found'))
-          }
-        },
-        patchService: {
-          handler: (params, body, res) => {
-            return Promise.resolve(mocks.service)
-          }
-        },
-        consoleEvent: {
-          handler: (params, body, res) => {
-            res.status(201)
-            res.header('location', '/services/example/events/312q34')
-            return Promise.resolve()
-          }
-        }
+      let operationsToAdd = {}
+      _.each(mocks, (getHandler, mockName) => {
+        operationsToAdd[mockName] = getHandler()
       })
+      return service.server.addOperations(operationsToAdd)
     })
     .then(service.server.start)
 })
