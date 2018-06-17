@@ -6,7 +6,7 @@ schemas:
       service_host_name: localhost
       domapic_path: .test
     docker-service: &docker-service-env
-      controller_host_name: domapic-controller
+      controller_host_name: controller-container
       service_port: 3000
       service_host_name: service-container
       domapic_path: .shared
@@ -15,8 +15,9 @@ schemas:
       controller_host_name: localhost
       domapic_path: .test
     docker-controller: &docker-controller-env
-      controller_host_name: domapic-controller
+      controller_host_name: controller-container
       domapic_path: .shared
+      controller_extra_options: --authDisabled=172.0.0.0/8 --logLevel=debug
   bind: &bind
     - lib
     - test
@@ -26,6 +27,8 @@ schemas:
     clean: &clean
       local:
         command: test/integration/commands/clean.sh
+      docker:
+        down-volumes: true
     coverage: &integration-coverage
       enabled: false
     services:
@@ -124,7 +127,11 @@ suites:
             env:
               <<: *local-service-env
               service_extra_options: --controller=http://localhost:3000 --logLevel=debug
-          docker: *docker-service-wait
+          docker:
+            <<: *docker-service-wait
+            env:
+              <<: *docker-service-env
+              service_extra_options: --controller=http://controller-container:3000 --logLevel=debug
       test:
         <<: *integration-test
         specs:
@@ -155,7 +162,11 @@ suites:
             env:
               <<: *local-service-env
               service_extra_options: --controller=http://localhost:3000 --logLevel=debug
-          docker: *docker-service-wait
+          docker:
+            <<: *docker-service-wait
+            env:
+              <<: *docker-service-env
+              service_extra_options: --controller=http://controller-container:3000 --logLevel=debug
       test:
         <<: *integration-test
         specs:
@@ -184,7 +195,11 @@ suites:
             env:
               <<: *local-service-env
               service_extra_options: --controller=http://localhost:3000 --logLevel=debug
-          docker: *docker-service-wait
+          docker:
+            <<: *docker-service-wait
+            env:
+              <<: *docker-service-env
+              service_extra_options: --controller=http://controller-container:3000 --logLevel=debug
       test:
         <<: *integration-test
         specs: 
