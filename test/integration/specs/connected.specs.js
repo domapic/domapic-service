@@ -16,4 +16,11 @@ test.describe('when service finish connection process', function () {
         return test.expect(log).to.contain(`Connection success with Domapic Controller`)
       })
   })
+
+  test.it('should have saved the controller assigned api key into the configuration file', () => {
+    return utils.readStorage('config')
+      .then((config) => {
+        return test.expect(config.controllerApiKey).to.equal(`foo-api-key-for-service`)
+      })
+  })
 })

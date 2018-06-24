@@ -28,11 +28,12 @@
   },
   "dependencies": {
     "bluebird": "3.5.1",
-    "domapic-base": "1.0.0-beta.2",
+    "domapic-base": "file:../domapic-base",
     "lodash": "4.17.10",
     "rand-token": "0.4.0",
     "jsonschema": "1.2.4",
-    "deep-equal": "1.0.1"
+    "deep-equal": "1.0.1",
+    "ip": "1.1.5"
   },
   "devDependencies": {
     "coveralls": "3.0.1",

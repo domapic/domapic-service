@@ -10,6 +10,13 @@ test.describe('when service is already registered in controller', function () {
     return utils.waitOnestimatedStartTime(2000)
   })
 
+  test.it('should have created an user in the controller', () => {
+    return utils.readOutErr()
+      .then((log) => {
+        return test.expect(log).to.contain(`POST | 200 | http://${process.env.controller_host_name}:3000/api/auth/apikey`)
+      })
+  })
+
   test.it('should have ensured that service was not already registered', () => {
     return utils.readOutErr()
       .then((log) => {

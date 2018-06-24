@@ -37,6 +37,10 @@
           "apiKey": {
             "description": "Api key for the controller to be used in connections with the service",
             "type": "string"
+          },
+          "url": {
+            "description": "Url of the service",
+            "type": "string"
           }
         },
         "additionalProperties": false,
@@ -46,7 +50,8 @@
           "type": "service",
           "package": "foo-package-name",
           "version": "1.0.0",
-          "description": "Foo microservice package"
+          "description": "Foo microservice package",
+          "url": "http://raspberry:23512"
         }
       },
       "NewService": {

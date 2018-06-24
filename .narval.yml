@@ -17,7 +17,7 @@ schemas:
     docker-controller: &docker-controller-env
       controller_host_name: controller-container
       domapic_path: .shared
-      controller_extra_options: --authDisabled=172.0.0.0/8 --logLevel=debug
+      controller_extra_options: --authDisabled --logLevel=debug
   bind: &bind
     - lib
     - test
@@ -137,6 +137,72 @@ suites:
         specs:
           - test/integration/specs/controller-register.specs.js
           - test/integration/specs/connected.specs.js
+      coverage: *integration-coverage
+    - name: controller-register-authentication
+      describe: should register the service in controller when started, and authentication is enabled
+      before: *clean
+      services:
+        - name: domapic-controller
+          local:
+            <<: *local-controller
+            env:
+              <<: *local-controller-env
+              controller_extra_options: --authDisabled --logLevel=debug
+          docker:
+            <<: *docker-controller
+            env:
+              <<: *docker-controller-env
+              controller_extra_options: --authDisabled --logLevel=debug
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-wait
+            env:
+              <<: *local-service-env
+              service_extra_options: --controller=http://localhost:3000 --logLevel=debug --api-key=foo-api-key
+          docker:
+            <<: *docker-service-wait
+            env:
+              <<: *docker-service-env
+              service_extra_options: --controller=http://controller-container:3000 --logLevel=debug --api-key=foo-api-key
+      test:
+        <<: *integration-test
+        specs:
+          - test/integration/specs/controller-register.specs.js
+          - test/integration/specs/connected.specs.js
+      coverage: *integration-coverage
+    - name: controller-register-authentication-failed
+      describe: should fail registering the service in controller when started, and print an api key valid to launch a pairing command from controller
+      before: *clean
+      services:
+        - name: domapic-controller
+          local:
+            <<: *local-controller
+            env:
+              <<: *local-controller-env
+              controller_extra_options: --authDisabled --logLevel=debug
+          docker:
+            <<: *docker-controller
+            env:
+              <<: *docker-controller-env
+              controller_extra_options: --authDisabled --logLevel=debug
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-wait
+            env:
+              <<: *local-service-env
+              service_extra_options: --controller=http://localhost:3000 --logLevel=debug
+          docker:
+            <<: *docker-service-wait
+            env:
+              <<: *docker-service-env
+              service_extra_options: --controller=http://controller-container:3000 --logLevel=debug
+      test:
+        <<: *integration-test
+        specs:
+          - test/integration/specs/no-controller-api-key.specs.js
+          - test/integration/specs/not-connected.specs.js
       coverage: *integration-coverage
     - name: update-abilities
       describe: should update abilities in controller when have changed

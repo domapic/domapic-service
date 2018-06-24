@@ -38,7 +38,7 @@ const waitOnestimatedStartTime = function (time = ESTIMATED_START_TIME) {
 
 const request = function (uri, options = {}) {
   const defaultOptions = {
-    uri: `http://${SERVICE_HOST}:${SERVICE_PORT}/api/${uri}`,
+    uri: `http://${SERVICE_HOST}:${SERVICE_PORT}/api${uri}`,
     json: true,
     strictSSL: false,
     rejectUnauthorized: false,
@@ -49,8 +49,8 @@ const request = function (uri, options = {}) {
   return requestPromise(Object.assign(defaultOptions, options))
 }
 
-const readStorage = function () {
-  return readFile(path.resolve(__dirname, '..', '..', '..', DOMAPIC_PATH, '.domapic', 'foo-service', 'storage', 'service.json'))
+const readStorage = function (file = 'storage') {
+  return readFile(path.resolve(__dirname, '..', '..', '..', DOMAPIC_PATH, '.domapic', 'foo-service', file, 'service.json'))
     .then((data) => {
       return Promise.resolve(JSON.parse(data))
     })

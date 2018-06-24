@@ -41,7 +41,7 @@ const Mocks = function (service) {
       }
     },
     addService: {
-      created: function (params, body, res) {
+      created: function (params, body, res, user) {
         res.status(201)
         res.header('location', '/services/example')
         return Promise.resolve({
