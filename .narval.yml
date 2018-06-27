@@ -17,7 +17,7 @@ schemas:
     docker-controller: &docker-controller-env
       controller_host_name: controller-container
       domapic_path: .shared
-      controller_extra_options: --authDisabled --logLevel=debug
+      controller_extra_options: --authDisabled=172.0.0.0/8 --logLevel=debug
   bind: &bind
     - lib
     - test
