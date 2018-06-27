@@ -272,3 +272,81 @@ suites:
           - test/integration/specs/name-already-exists.specs.js
           - test/integration/specs/not-connected.specs.js
       coverage: *integration-coverage
+    - name: connection-api
+      describe: should connect to controller when calling to connection api
+      before: *clean
+      services:
+        - name: domapic-controller
+          local: *local-controller
+          docker: *docker-controller
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-wait
+            env:
+              <<: *local-service-env
+              service_extra_options: --logLevel=debug
+          docker:
+            <<: *docker-service-wait
+            env:
+              <<: *docker-service-env
+              service_extra_options: --logLevel=debug
+      test:
+        <<: *integration-test
+        specs:
+          - test/integration/specs/no-controller-api-key.specs.js
+          - test/integration/specs/not-connected.specs.js
+          - test/integration/specs/connection-api.specs.js
+          - test/integration/specs/controller-register.specs.js
+    - name: connection-api-conflict
+      describe: should try to connect to controller when calling to connection api, and return conflict if service is already registered with another id
+      before: *clean
+      services:
+        - name: domapic-controller
+          local:
+            <<: *local-controller
+            env:
+              <<: *local-controller-env
+              get_service_handler: exists-different-id
+          docker:
+            <<: *docker-controller
+            env:
+              <<: *docker-controller-env
+              get_service_handler: exists-different-id
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-wait
+            env:
+              <<: *local-service-env
+              service_extra_options: --logLevel=debug
+          docker:
+            <<: *docker-service-wait
+            env:
+              <<: *docker-service-env
+              service_extra_options: --logLevel=debug
+      test:
+        <<: *integration-test
+        specs:
+          - test/integration/specs/no-controller-api-key.specs.js
+          - test/integration/specs/not-connected.specs.js
+          - test/integration/specs/connection-api-conflict.specs.js
+          - test/integration/specs/name-already-exists.specs.js
+          - test/integration/specs/not-connected.specs.js
+    - name: connection-api-unavailable
+      describe: should try to connect to controller when calling to connection api, and return conflict if service is already registered with another id
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service
+          docker:
+            <<: *docker-service
+      test:
+        <<: *integration-test
+        specs:
+          - test/integration/specs/no-controller-api-key.specs.js
+          - test/integration/specs/not-connected.specs.js
+          - test/integration/specs/connection-api-unavailable.specs.js
+          - test/integration/specs/not-connected.specs.js

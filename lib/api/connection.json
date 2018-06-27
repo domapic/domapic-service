@@ -1,0 +1,67 @@
+{
+  "tags": [{
+    "name": "connection",
+    "description": "Connection to Domapic Controller"
+  }],
+  "components": {
+    "schemas": {
+      "Connection": {
+        "description": "Connection to a Domapic Controller",
+        "type": "object",
+        "properties": {
+          "active": {
+            "description": "Connection is active",
+            "type": "boolean"
+          },
+          "url": {
+            "description": "Url of the Domapic Controller",
+            "type": "string"
+          },
+          "apiKey": {
+            "description": "Api key to authenticate against Domapic Controller",
+            "type": "string"
+          }
+        },
+        "required": ["active", "url"],
+        "additionalProperties": false,
+        "example": {
+          "active": true,
+          "url": "http://192.168.1.100:3000",
+          "apiKey": "foo-api-key"
+        }
+      }
+    }
+  },
+  "paths": {
+    "/connection": {
+      "put": {
+        "tags": ["connection"],
+        "summary": "Controller connection",
+        "description": "Updates controller connection data, and dispatches the connection command if it is active. Disconnect from controller if is not active",
+        "operationId": "connection",
+        "requestBody": {
+          "description": "Connection data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Connection"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Connection success"
+          },
+          "409": {
+            "$ref": "#/components/responses/ConflictError"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServerUnavailableError"
+          }
+        }
+      }
+    }
+  }
+}

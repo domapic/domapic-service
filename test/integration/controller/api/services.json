@@ -40,7 +40,8 @@
           },
           "url": {
             "description": "Url of the service",
-            "type": "string"
+            "type": "string",
+            "format": "uri"
           }
         },
         "additionalProperties": false,

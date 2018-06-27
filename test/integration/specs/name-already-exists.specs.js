@@ -27,7 +27,7 @@ test.describe('when service is already registered in controller with another id'
   test.it('should have printed an error, informing that service name already exists', () => {
     return utils.readOutErr()
       .then((log) => {
-        return test.expect(log).to.contain(`Error connecting to Controller: The service name is already defined in Controller with different id`)
+        return test.expect(log).to.contain(`The service name is already defined in Controller with different id`)
       })
   })
 })
