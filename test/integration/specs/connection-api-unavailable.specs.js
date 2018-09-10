@@ -3,7 +3,7 @@ const test = require('narval')
 
 const utils = require('./utils')
 
-test.describe('when connection api is called and service is already registered with another id', function () {
+test.describe('when connection api is called and it is unavailable', function () {
   this.timeout(10000)
 
   test.it('should have responded with a server unavailable status code', () => {

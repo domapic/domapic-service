@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "bluebird": "3.5.1",
-    "domapic-base": "1.0.0-beta.5",
+    "domapic-base": "1.0.0-beta.8",
     "lodash": "4.17.10",
     "rand-token": "0.4.0",
     "jsonschema": "1.2.4",
@@ -39,7 +39,7 @@
     "coveralls": "3.0.2",
     "request-promise": "4.2.2",
     "request": "2.87.0",
-    "narval": "1.2.0"
+    "narval": "2.2.1"
   },
   "author": {
     "name": "Javier Brea",

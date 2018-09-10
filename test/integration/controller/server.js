@@ -17,7 +17,7 @@ new domapic.Service({
     apiKey: {
       verify: (apiKey) => {
         return Promise.resolve({
-          userName: 'foo-service',
+          user: 'foo-service',
           role: 'service'
         })
       },

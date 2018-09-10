@@ -15,12 +15,12 @@ const findApiKey = function (property, value) {
 }
 
 test.describe('auth api', () => {
-  test.describe('post method', () => {
+  test.describe.only('post method', () => {
     test.it('should add a new api key with the provided data', () => {
       return utils.request('/auth/apikey', {
         method: 'POST',
         body: {
-          userName: 'foo-user',
+          user: 'foo-user',
           role: 'foo-role',
           reference: 'foo-api-key'
         }
@@ -40,7 +40,7 @@ test.describe('auth api', () => {
       return utils.request('/auth/apikey', {
         method: 'POST',
         body: {
-          userName: 'foo-user',
+          user: 'foo-user',
           role: 'foo-role',
           reference: 'foo-api-key-2'
         }
@@ -53,8 +53,8 @@ test.describe('auth api', () => {
             return PromiseB.all([
               test.expect(apiKeys.previous).to.not.be.undefined(),
               test.expect(apiKeys.new).to.not.be.undefined(),
-              test.expect(apiKeys.previous.userName).to.equal('foo-user'),
-              test.expect(apiKeys.new.userName).to.equal('foo-user'),
+              test.expect(apiKeys.previous.user).to.equal('foo-user'),
+              test.expect(apiKeys.new.user).to.equal('foo-user'),
               test.expect(response.statusCode).to.equal(200),
               test.expect(response.body.apiKey).to.equal(apiKeys.new.key)
             ])
@@ -66,7 +66,7 @@ test.describe('auth api', () => {
       return utils.request('/auth/apikey', {
         method: 'POST',
         body: {
-          userName: 'foo-user-2',
+          user: 'foo-user-2',
           role: 'foo-role',
           reference: 'foo-api-key'
         }
@@ -75,7 +75,7 @@ test.describe('auth api', () => {
           .then(apiKey => {
             return PromiseB.all([
               test.expect(apiKey).to.not.be.undefined(),
-              test.expect(apiKey.userName).to.equal('foo-user'),
+              test.expect(apiKey.user).to.equal('foo-user'),
               test.expect(response.statusCode).to.equal(422)
             ])
           })

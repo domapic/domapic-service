@@ -334,7 +334,7 @@ suites:
           - test/integration/specs/name-already-exists.specs.js
           - test/integration/specs/not-connected.specs.js
     - name: connection-api-unavailable
-      describe: should try to connect to controller when calling to connection api, and return conflict if service is already registered with another id
+      describe: should try to connect to controller when calling to connection api, and return server unavailable if controller is unavailable
       before: *clean
       services:
         - name: domapic-service
