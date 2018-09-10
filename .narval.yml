@@ -298,6 +298,7 @@ suites:
           - test/integration/specs/not-connected.specs.js
           - test/integration/specs/connection-api.specs.js
           - test/integration/specs/controller-register.specs.js
+      coverage: *integration-coverage
     - name: connection-api-conflict
       describe: should try to connect to controller when calling to connection api, and return conflict if service is already registered with another id
       before: *clean
@@ -333,6 +334,7 @@ suites:
           - test/integration/specs/connection-api-conflict.specs.js
           - test/integration/specs/name-already-exists.specs.js
           - test/integration/specs/not-connected.specs.js
+      coverage: *integration-coverage
     - name: connection-api-unavailable
       describe: should try to connect to controller when calling to connection api, and return server unavailable if controller is unavailable
       before: *clean
@@ -350,3 +352,4 @@ suites:
           - test/integration/specs/not-connected.specs.js
           - test/integration/specs/connection-api-unavailable.specs.js
           - test/integration/specs/not-connected.specs.js
+      coverage: *integration-coverage

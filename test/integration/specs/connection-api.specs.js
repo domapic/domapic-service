@@ -1,5 +1,6 @@
 
 const test = require('narval')
+const testUtils = require('narval/utils')
 
 const utils = require('./utils')
 
@@ -18,7 +19,7 @@ test.describe('when connection api is called', function () {
     }).then((response) => {
       return utils.waitOnestimatedStartTime(2000)
         .then(() => {
-          return utils.readOutErr()
+          return testUtils.logs.combined('domapic-service')
             .then((log) => {
               return Promise.all([
                 test.expect(log).to.contain(`Connection success with Domapic Controller at ${controllerUrl}`),

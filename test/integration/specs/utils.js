@@ -22,12 +22,6 @@ const readFile = function (filePath) {
   })
 }
 
-const ReadLogs = function (fileName = 'combined-outerr') {
-  return function (serviceName = 'domapic-service') {
-    return readFile(path.resolve(__dirname, '..', '..', '..', '.narval', 'logs', 'integration', process.env.narval_suite, serviceName, `${fileName}.log`))
-  }
-}
-
 const waitOnestimatedStartTime = function (time = ESTIMATED_START_TIME) {
   return new Promise(resolve => {
     setTimeout(() => {
@@ -58,7 +52,6 @@ const readStorage = function (file = 'storage') {
 
 module.exports = {
   waitOnestimatedStartTime: waitOnestimatedStartTime,
-  readOutErr: new ReadLogs(),
   request: request,
   readStorage: readStorage
 }
