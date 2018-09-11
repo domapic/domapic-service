@@ -51,7 +51,7 @@ new domapic.Service({
           return Promise.resolve(lastCharacter)
         }
       },
-      command: {
+      action: {
         description: 'Print the received character into console',
         auth: false,
         handler: (data) => {

@@ -36,7 +36,7 @@ test.describe('when controller url is provided', function () {
   test.it('should register all abilities in the controller', () => {
     return Promise.all([
       test.expect(serviceLogs).to.contain('Creating "state" of ability "console" in controller'),
-      test.expect(serviceLogs).to.contain('Creating "command" of ability "console" in controller'),
+      test.expect(serviceLogs).to.contain('Creating "action" of ability "console" in controller'),
       test.expect(serviceLogs).to.contain('Creating "event" of ability "console" in controller')
     ])
   })

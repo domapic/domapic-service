@@ -85,7 +85,7 @@
           },
           "type": {
             "type": "string",
-            "enum": ["event", "command", "state"]
+            "enum": ["event", "action", "state"]
           },
           "deprecated": {
             "type": "boolean"
@@ -161,7 +161,7 @@
           "service": "fsr13242gerasdg43erg2323efg",
           "name": "foo-ability",
           "description": "Foo service ability",
-          "type": "command",
+          "type": "action",
           "data": {
             "type": "string",
             "minLength": 45
