@@ -14,6 +14,7 @@ schemas:
     local-controller: &local-controller-env
       controller_host_name: localhost
       domapic_path: .test
+      service_extra_options: --authDisabled=172.0.0.0/8
     docker-controller: &docker-controller-env
       controller_host_name: controller-container
       domapic_path: .shared
