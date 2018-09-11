@@ -35,8 +35,8 @@ test.describe('when service is already registered in controller', function () {
 
   test.it('should deprecate an ability if data field has changed, and create a new one', () => {
     return Promise.all([
-      test.expect(serviceLogs).to.contain('Deprecating "command" of ability "console" in controller'),
-      test.expect(serviceLogs).to.contain('Creating "command" of ability "console" in controller')
+      test.expect(serviceLogs).to.contain('Deprecating "action" of ability "console" in controller'),
+      test.expect(serviceLogs).to.contain('Creating "action" of ability "console" in controller')
     ])
   })
 

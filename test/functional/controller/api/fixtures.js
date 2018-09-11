@@ -43,7 +43,7 @@ const abilities = [
   {
     id: 2304234234,
     name: 'console',
-    type: 'command',
+    type: 'action',
     description: 'Print the received character into console',
     data: {
       type: 'string'

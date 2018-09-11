@@ -95,7 +95,7 @@
       "required": ["description", "handler"],
       "additionalProperties": false
     },
-    "command": {
+    "action": {
       "type": "object",
       "properties": {
         "description": {
@@ -115,7 +115,7 @@
   "anyOf": [{
     "required": ["description", "data", "event"]
   }, {
-    "required": ["description", "data", "command"]
+    "required": ["description", "data", "action"]
   }, {
     "required": ["description", "data", "state"]
   }],
