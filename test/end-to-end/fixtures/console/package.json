@@ -5,6 +5,9 @@
   "dependencies": {
     "domapic-service": "file:../../../../"
   },
+  "scripts": {
+    "domapic-controller": "node_modules/.bin/domapic-controller"
+  },
   "devDependencies": {
     "domapic-controller": "domapic/domapic-controller#release-1.0.0-beta.1"
   }

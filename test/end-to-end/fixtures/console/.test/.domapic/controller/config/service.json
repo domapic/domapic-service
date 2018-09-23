@@ -1,0 +1,12 @@
+{
+  "color": true,
+  "logLevel": "info",
+  "port": 3000,
+  "authDisabled": [
+    "127.0.0.1",
+    "::1/128"
+  ],
+  "hostName": "localhost",
+  "db": "mongodb://localhost:27017/domapic",
+  "path": "/Users/javierbrea/Proyectos/repos/domapic-service/test/end-to-end/fixtures/console/.test"
+}

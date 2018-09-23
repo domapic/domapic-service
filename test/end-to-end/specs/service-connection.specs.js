@@ -10,10 +10,10 @@ test.describe('when service starts and connection options are provided', functio
   test.it('should have connected to the controller', () => {
     return utils.waitOnestimatedStartTime(2000)
       .then(() => {
-        return testUtils.logs.combined('domapic-service')
+        return testUtils.logs.combined('service')
           .then((log) => {
             return Promise.all([
-              test.expect(log).to.contain(`Connection success with Domapic Controller at ${controllerUrl}`),
+              test.expect(log).to.contain(`Connection success with Domapic Controller at ${utils.CONTROLLER_URL}`),
               test.expect(response.statusCode).to.equal(200)
             ])
           })

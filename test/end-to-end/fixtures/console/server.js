@@ -18,8 +18,8 @@ new domapic.Service({
     console: {
       description: 'Handle console log',
       data: {
-        type: 'string'
-        maxLength: 1,
+        type: 'string',
+        maxLength: 1
       },
       event: {
         description: 'Console has just printed a character'

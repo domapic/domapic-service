@@ -6,10 +6,11 @@ const fs = require('fs')
 const requestPromise = require('request-promise')
 
 const SERVICE_HOST = process.env.service_host_name
-const SERVICE_PORT = '3000'
+const SERVICE_PORT = process.env.service_port
 const DOMAPIC_PATH = process.env.domapic_path
 const SERVICE_NAME = process.env.fixture
 const ESTIMATED_START_TIME = 1000
+const CONTROLLER_URL = `http://${process.env.controller_host_name}:3000`
 
 const readFile = function (filePath) {
   return new Promise((resolve, reject) => {
@@ -54,5 +55,7 @@ const readStorage = function (file = 'storage') {
 module.exports = {
   waitOnestimatedStartTime: waitOnestimatedStartTime,
   request: request,
-  readStorage: readStorage
+  readStorage: readStorage,
+  SERVICE_NAME,
+  CONTROLLER_URL
 }

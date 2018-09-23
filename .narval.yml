@@ -396,18 +396,20 @@ suites:
           docker:
             container: service-container
             command: test/end-to-end/commands/start-service.sh
-            wait-on: tcp:controller-container:27017
+            wait-on: tcp:controller-container:3000
             env:
               controller_host_name: controller-container
               service_host_name: service-container
+              service_port: 3000
               fixture: console
               domapic_path: .shared
           local:
             command: test/end-to-end/commands/start-service.sh
-            wait-on: tcp:localhost:27017
+            wait-on: tcp:localhost:3000
             env:
               controller_host_name: localhost
               service_host_name: localhost
+              service_port: 3100
               fixture: console
               domapic_path: .test
       test:
@@ -416,12 +418,16 @@ suites:
           env:
             controller_host_name: localhost
             service_host_name: localhost
+            service_port: 3100
+            fixture: console
         docker:
           container: test-container
           wait-on: tcp:service-container:3000
           env:
             controller_host_name: controller-container
             service_host_name: service-container
+            service_port: 3000
+            fixture: console
         specs:
           - test/end-to-end/specs/service-connection.specs.js
       coverage:
