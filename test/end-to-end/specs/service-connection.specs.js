@@ -12,10 +12,7 @@ test.describe('when service starts and connection options are provided', functio
       .then(() => {
         return testUtils.logs.combined('service')
           .then((log) => {
-            return Promise.all([
-              test.expect(log).to.contain(`Connection success with Domapic Controller at ${utils.CONTROLLER_URL}`),
-              test.expect(response.statusCode).to.equal(200)
-            ])
+            return test.expect(log).to.contain(`Connection success with Domapic Controller at ${utils.CONTROLLER_URL}`)
           })
       })
   })

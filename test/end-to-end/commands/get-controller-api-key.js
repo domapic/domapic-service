@@ -19,7 +19,7 @@ const waitAndGetLogs = () => {
       getLogs().then(() => {
         resolve()
       })
-    }, 2000);
+    }, 2000)
   })
 }
 
