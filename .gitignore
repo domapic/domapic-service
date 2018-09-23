@@ -5,4 +5,6 @@ npm-debug.log
 /.test
 /.narval
 /.coverage
+/test/end-to-end/fixtures/**/package-lock.json
+/test/end-to-end/fixtures/**/.test
 
