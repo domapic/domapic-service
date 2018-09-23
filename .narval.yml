@@ -414,7 +414,7 @@ suites:
               domapic_path: .test
       test:
         local:
-          wait-on: tcp:localhost:3000
+          wait-on: tcp:localhost:3100
           env:
             controller_host_name: localhost
             service_host_name: localhost
