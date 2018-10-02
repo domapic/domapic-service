@@ -19,7 +19,7 @@ schemas:
   functional:
     clean: &clean
       local:
-        command: test/functional/commands/clean.sh
+        command: test/functional/commands/local-clean.sh
       docker:
         down-volumes: true
     coverage: &functional-coverage
@@ -53,6 +53,7 @@ docker-images:
       - 3000
     add:
       - package.json
+      - package-lock.json
     install: test/functional/commands/install.sh
   - name: mongodb-image
     from: mongo:3.6.4

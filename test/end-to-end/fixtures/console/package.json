@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Example of Node.js Domapic service that handles console",
   "dependencies": {
-    "domapic-service": "1.0.0-beta.11"
+    "domapic-service": "file:../../../../"
   },
   "scripts": {
     "domapic-controller": "node_modules/.bin/domapic-controller"
