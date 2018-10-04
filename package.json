@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "bluebird": "3.5.1",
-    "domapic-base": "1.0.0-beta.9",
+    "domapic-base": "1.0.0-beta.11",
     "lodash": "4.17.10",
     "rand-token": "0.4.0",
     "jsonschema": "1.2.4",
