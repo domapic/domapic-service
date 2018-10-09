@@ -23,6 +23,7 @@ schemas:
       local:
         command: test/functional/commands/local-clean.sh
       docker:
+        command: test/functional/commands/clean.sh
         down-volumes: true
     services:
       local-service: &local-service
