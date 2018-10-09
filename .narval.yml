@@ -59,6 +59,8 @@ schemas:
         docker:
           container: mongodb-container
           command: test/end-to-end/commands/mongodb-docker.sh
+          env:
+            domapic_path: .shared
       controller: &e2e-controller-service
         name: controller
         docker:

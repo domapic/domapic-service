@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-if ! [ -d db ]; then
-  mkdir db
+if ! [ -d ${domapic_path}/db ]; then
+  mkdir ${domapic_path}/db
 fi
 mongod --version
-mongod --dbpath=db --bind_ip_all
+mongod --dbpath=${domapic_path}/db --bind_ip_all
