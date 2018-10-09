@@ -1,29 +1,29 @@
 schemas:
-  envs:
-    local-service: &local-service-env
-      controller_host_name: localhost
-      service_port: 3100
-      service_host_name: localhost
-      domapic_path: .test
-    docker-service: &docker-service-env
-      controller_host_name: controller-container
-      service_port: 3000
-      service_host_name: service-container
-      domapic_path: .shared
-      service_extra_options: --authDisabled=172.0.0.0/8
   bind: &bind
     - lib
     - test
     - cli
     - index.js
+  coverage: &disable-coverage
+      enabled: false
   functional:
+    envs:
+      local-service: &local-service-env
+        controller_host_name: localhost
+        service_port: 3100
+        service_host_name: localhost
+        domapic_path: .test
+      docker-service: &docker-service-env
+        controller_host_name: controller-container
+        service_port: 3000
+        service_host_name: service-container
+        domapic_path: .shared
+        service_extra_options: --authDisabled=172.0.0.0/8
     clean: &clean
       local:
         command: test/functional/commands/local-clean.sh
       docker:
         down-volumes: true
-    coverage: &functional-coverage
-      enabled: false
     services:
       local-service: &local-service
         command: test/functional/commands/start-service.sh
@@ -46,6 +46,74 @@ schemas:
         container: test-container
         wait-on: tcp:service-container:3000
         env: *docker-service-env
+  end-to-end:
+    before: &e2e-clean
+      local:
+        command: test/end-to-end/commands/local-clean.sh
+      docker:
+        down-volumes: true
+    services:
+      mongodb: &e2e-mongodb-service
+        name: mongodb
+        docker:
+          container: mongodb-container
+          command: test/end-to-end/commands/mongodb-docker.sh
+      controller: &e2e-controller-service
+        name: controller
+        docker:
+          container: controller-container
+          command: test/end-to-end/commands/start-controller.sh
+          wait-on: tcp:mongodb-container:27017
+          env:
+            controller_host_name: controller-container
+            fixture: console
+            domapic_path: .shared
+            db_uri: mongodb://mongodb-container:27017/domapic
+        local:
+          command: test/end-to-end/commands/start-controller.sh
+          wait-on: tcp:localhost:27017
+          env:
+            controller_host_name: localhost
+            fixture: console
+            domapic_path: .test
+            db_uri: mongodb://localhost:27017/domapic
+      service: &e2e-service-service
+        name: service
+        docker:
+          container: service-container
+          command: test/end-to-end/commands/start-service.sh
+          wait-on: tcp:controller-container:3000
+          env:
+            controller_host_name: controller-container
+            service_host_name: service-container
+            service_port: 3000
+            fixture: console
+            domapic_path: .shared
+        local:
+          command: test/end-to-end/commands/start-service.sh
+          wait-on: tcp:localhost:3000
+          env:
+            controller_host_name: localhost
+            service_host_name: localhost
+            service_port: 3100
+            fixture: console
+            domapic_path: .test
+      test: &e2e-test
+        local:
+          wait-on: tcp:localhost:3100
+          env:
+            controller_host_name: localhost
+            service_host_name: localhost
+            service_port: 3100
+            fixture: console
+        docker:
+          container: test-container
+          wait-on: tcp:service-container:3000
+          env:
+            controller_host_name: controller-container
+            service_host_name: service-container
+            service_port: 3000
+            fixture: console
 docker-images:
   - name: node-image
     from: node:8.11.1
@@ -94,7 +162,7 @@ suites:
         specs:
           - test/functional/specs/no-controller-api-key.specs.js
           - test/functional/specs/not-connected.specs.js
-      coverage: *functional-coverage
+      coverage: *disable-coverage
     - name: auth-api
       describe: should add or remove api keys
       before: *clean
@@ -106,7 +174,7 @@ suites:
       test:
         <<: *functional-test
         specs: test/functional/specs/auth-api.specs.js
-      coverage: *functional-coverage
+      coverage: *disable-coverage
     - name: connection-api-unavailable
       describe: should try to connect to controller when calling to connection api, and return server unavailable if controller is unavailable
       before: *clean
@@ -124,75 +192,28 @@ suites:
           - test/functional/specs/not-connected.specs.js
           - test/functional/specs/connection-api-unavailable.specs.js
           - test/functional/specs/not-connected.specs.js
-      coverage: *functional-coverage
+      coverage: *disable-coverage
   end-to-end:
     - name: service-connection
-      description: Service should connect to controller when started first time if connection ptions are provided
-      before:
-        local:
-          command: test/end-to-end/commands/local-clean.sh
-        docker:
-          down-volumes: true
+      describe: Service should connect to controller when started first time if connection options are provided
+      before: *e2e-clean
       services:
-        - name: mongodb
-          docker:
-            container: mongodb-container
-            command: test/end-to-end/commands/mongodb-docker.sh
-        - name: controller
-          docker:
-            container: controller-container
-            command: test/end-to-end/commands/start-controller.sh
-            wait-on: tcp:mongodb-container:27017
-            env:
-              controller_host_name: controller-container
-              fixture: console
-              domapic_path: .shared
-              db_uri: mongodb://mongodb-container:27017/domapic
-          local:
-            command: test/end-to-end/commands/start-controller.sh
-            wait-on: tcp:localhost:27017
-            env:
-              controller_host_name: localhost
-              fixture: console
-              domapic_path: .test
-              db_uri: mongodb://localhost:27017/domapic
-        - name: service
-          docker:
-            container: service-container
-            command: test/end-to-end/commands/start-service.sh
-            wait-on: tcp:controller-container:3000
-            env:
-              controller_host_name: controller-container
-              service_host_name: service-container
-              service_port: 3000
-              fixture: console
-              domapic_path: .shared
-          local:
-            command: test/end-to-end/commands/start-service.sh
-            wait-on: tcp:localhost:3000
-            env:
-              controller_host_name: localhost
-              service_host_name: localhost
-              service_port: 3100
-              fixture: console
-              domapic_path: .test
+        - *e2e-mongodb-service
+        - *e2e-controller-service
+        - *e2e-service-service
       test:
-        local:
-          wait-on: tcp:localhost:3100
-          env:
-            controller_host_name: localhost
-            service_host_name: localhost
-            service_port: 3100
-            fixture: console
-        docker:
-          container: test-container
-          wait-on: tcp:service-container:3000
-          env:
-            controller_host_name: controller-container
-            service_host_name: service-container
-            service_port: 3000
-            fixture: console
+        <<: *e2e-test
         specs:
           - test/end-to-end/specs/service-connection.specs.js
-      coverage:
-        enabled: false
+      coverage: *disable-coverage
+    - name: service-reconnection
+      describe: Service should connect again to controller when restarted
+      services:
+        - *e2e-mongodb-service
+        - *e2e-controller-service
+        - *e2e-service-service
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+      coverage: *disable-coverage
