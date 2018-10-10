@@ -35,7 +35,7 @@ const waitOnestimatedStartTime = function (time = ESTIMATED_START_TIME) {
 
 const request = function (uri, options = {}) {
   const defaultOptions = {
-    uri: `http://${SERVICE_HOST}:${SERVICE_PORT}/api${uri}`,
+    uri,
     json: true,
     strictSSL: false,
     rejectUnauthorized: false,
@@ -43,7 +43,7 @@ const request = function (uri, options = {}) {
     requestCert: false,
     resolveWithFullResponse: true
   }
-  return requestPromise(Object.assign(defaultOptions, options))
+  return requestPromise({ ...defaultOptions, ...options })
 }
 
 const readStorage = function (file = 'storage') {
@@ -75,11 +75,47 @@ const waitAndGetControllerApiKey = () => {
   })
 }
 
+class ControllerConnection {
+  constructor () {
+    this._accessToken = null
+  }
+
+  async adminLogin () {
+    return request(`${CONTROLLER_URL}/api/auth/jwt`, {
+      method: 'POST',
+      body: {
+        user: 'admin',
+        password: 'admin'
+      }
+    }).then(response => {
+      return Promise.resolve(response.body.accessToken)
+    })
+  }
+
+  async request (uri, options = {}) {
+    const method = options.method || 'GET'
+    if (!this._accessToken) {
+      this._accessToken = await this.adminLogin()
+    }
+    console.log(this._accessToken)
+    return request(`${CONTROLLER_URL}/api${uri}`, 
+      { 
+        headers: {
+          authorization: `Bearer ${this._accessToken}`
+        },
+        method,
+        ...options
+      }
+    )
+  }
+}
+
 module.exports = {
   waitOnestimatedStartTime: waitOnestimatedStartTime,
   request: request,
   readStorage: readStorage,
   SERVICE_NAME,
   CONTROLLER_URL,
-  getControllerApiKey
+  getControllerApiKey,
+  ControllerConnection
 }

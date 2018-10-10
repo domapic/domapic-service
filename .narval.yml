@@ -208,6 +208,7 @@ suites:
         <<: *e2e-test
         specs:
           - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/specs/console-registered.specs.js
       coverage: *disable-coverage
     - name: service-reconnection
       describe: Service should connect again to controller when restarted
@@ -219,4 +220,5 @@ suites:
         <<: *e2e-test
         specs:
           - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/specs/console-registered.specs.js
       coverage: *disable-coverage
