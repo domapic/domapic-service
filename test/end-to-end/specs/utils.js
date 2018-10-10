@@ -98,8 +98,8 @@ class ControllerConnection {
       this._accessToken = await this.adminLogin()
     }
     console.log(this._accessToken)
-    return request(`${CONTROLLER_URL}/api${uri}`, 
-      { 
+    return request(`${CONTROLLER_URL}/api${uri}`,
+      {
         headers: {
           authorization: `Bearer ${this._accessToken}`
         },
@@ -115,6 +115,8 @@ module.exports = {
   request: request,
   readStorage: readStorage,
   SERVICE_NAME,
+  SERVICE_HOST,
+  SERVICE_PORT,
   CONTROLLER_URL,
   getControllerApiKey,
   ControllerConnection
