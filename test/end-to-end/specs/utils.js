@@ -3,6 +3,7 @@
 const path = require('path')
 const fs = require('fs')
 
+const testUtils = require('narval/utils')
 const requestPromise = require('request-promise')
 
 const SERVICE_HOST = process.env.service_host_name
@@ -52,10 +53,33 @@ const readStorage = function (file = 'storage') {
     })
 }
 
+const getControllerApiKey = () => {
+  return testUtils.logs.combined('controller')
+    .then(log => {
+      const match = log.match(/Use the next api key to register services: (\S*)\n/)
+      if (match && match[1]) {
+        console.log(match[1])
+        return Promise.resolve(match[1])
+      }
+      return waitAndGetControllerApiKey()
+    })
+}
+
+const waitAndGetControllerApiKey = () => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      getControllerApiKey().then(controllerApiKey => {
+        resolve(controllerApiKey)
+      })
+    }, 2000)
+  })
+}
+
 module.exports = {
   waitOnestimatedStartTime: waitOnestimatedStartTime,
   request: request,
   readStorage: readStorage,
   SERVICE_NAME,
-  CONTROLLER_URL
+  CONTROLLER_URL,
+  getControllerApiKey
 }
