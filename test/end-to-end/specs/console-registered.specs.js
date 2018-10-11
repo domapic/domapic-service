@@ -38,6 +38,7 @@ test.describe('when connection with controller is successful', function () {
       .then(response => {
         const ability = response.body.find(ability => ability.name === 'console')
         return Promise.all([
+          test.expect(response.body.length).to.equal(1),
           test.expect(ability._service).to.equal(serviceId),
           test.expect(ability._user).to.equal(serviceUserId),
           test.expect(ability.event).to.equal(true),

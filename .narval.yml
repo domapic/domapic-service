@@ -85,7 +85,10 @@ schemas:
         docker: &e2e-service-service-docker
           container: service-container
           command: test/end-to-end/commands/start-service.sh
-          wait-on: tcp:controller-container:3000
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:controller-container:3000
           env:  &e2e-service-service-docker-env
             controller_host_name: controller-container
             service_host_name: service-container
@@ -105,7 +108,10 @@ schemas:
             domapic_path: .test
       test: &e2e-test
         local: &e2e-test-local
-          wait-on: tcp:localhost:3100
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:localhost:3100
           env: &e2e-test-local-env
             controller_host_name: localhost
             service_host_name: localhost
@@ -255,14 +261,20 @@ suites:
       test:
         local:
           <<: *e2e-test-local
-          wait-on: tcp:localhost:3050
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:localhost:3050
           env:
             <<: *e2e-test-local-env
             service_port: 3050
             fixture: console-changed
         docker:
           <<: *e2e-test-docker
-          wait-on: tcp:service-container:3050
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:service-container:3050
           env:
             <<: *e2e-test-docker-env
             service_port: 3050
@@ -270,4 +282,57 @@ suites:
         specs:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-changed.specs.js
+      coverage: *disable-coverage
+    - name: service-ability-changed-reconnection
+      describe: Service should delete and create ability again if changed name or another sensible data
+      services:
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: console-ability-changed
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: console-ability-changed
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            env:
+              <<: *e2e-service-service-docker-env
+              service_port: 3050
+              fixture: console-ability-changed
+          local:
+            <<: *e2e-service-service-local
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: console-ability-changed
+              service_port: 3050
+      test:
+        local:
+          <<: *e2e-test-local
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:localhost:3050
+          env:
+            <<: *e2e-test-local-env
+            service_port: 3050
+            fixture: console-ability-changed
+        docker:
+          <<: *e2e-test-docker
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:service-container:3050
+          env:
+            <<: *e2e-test-docker-env
+            service_port: 3050
+            fixture: console-ability-changed
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/specs/console-ability-changed.specs.js
       coverage: *disable-coverage
