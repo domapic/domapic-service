@@ -97,7 +97,6 @@ class ControllerConnection {
     if (!this._accessToken) {
       this._accessToken = await this.adminLogin()
     }
-    console.log(this._accessToken)
     return request(`${CONTROLLER_URL}/api${uri}`,
       {
         headers: {
