@@ -1,0 +1,14 @@
+{
+  "name": "handle-console-domapic-2",
+  "version": "2.0.0",
+  "description": "Example of Node.js Domapic service with changed properties",
+  "dependencies": {
+    "domapic-service": "file:../../../../"
+  },
+  "scripts": {
+    "domapic-controller": "node_modules/.bin/domapic-controller"
+  },
+  "devDependencies": {
+    "domapic-controller": "1.0.0-alpha.3"
+  }
+}

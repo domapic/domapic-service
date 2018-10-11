@@ -63,56 +63,58 @@ schemas:
             domapic_path: .shared
       controller: &e2e-controller-service
         name: controller
-        docker:
+        docker: &e2e-controller-service-docker
           container: controller-container
           command: test/end-to-end/commands/start-controller.sh
           wait-on: tcp:mongodb-container:27017
-          env:
+          env: &e2e-controller-service-docker-env
             controller_host_name: controller-container
             fixture: console
             domapic_path: .shared
             db_uri: mongodb://mongodb-container:27017/domapic
-        local:
+        local: &e2e-controller-service-local
           command: test/end-to-end/commands/start-controller.sh
           wait-on: tcp:localhost:27017
-          env:
+          env: &e2e-controller-service-local-env
             controller_host_name: localhost
             fixture: console
             domapic_path: .test
             db_uri: mongodb://localhost:27017/domapic
       service: &e2e-service-service
         name: service
-        docker:
+        docker: &e2e-service-service-docker
           container: service-container
           command: test/end-to-end/commands/start-service.sh
           wait-on: tcp:controller-container:3000
-          env:
+          env:  &e2e-service-service-docker-env
             controller_host_name: controller-container
             service_host_name: service-container
             service_port: 3000
+            service_name: console
             fixture: console
             domapic_path: .shared
-        local:
+        local: &e2e-service-service-local
           command: test/end-to-end/commands/start-service.sh
           wait-on: tcp:localhost:3000
-          env:
+          env: &e2e-service-service-local-env
             controller_host_name: localhost
             service_host_name: localhost
             service_port: 3100
+            service_name: console
             fixture: console
             domapic_path: .test
       test: &e2e-test
-        local:
+        local: &e2e-test-local
           wait-on: tcp:localhost:3100
-          env:
+          env: &e2e-test-local-env
             controller_host_name: localhost
             service_host_name: localhost
             service_port: 3100
             fixture: console
-        docker:
+        docker: &e2e-test-docker
           container: test-container
           wait-on: tcp:service-container:3000
-          env:
+          env: &e2e-test-docker-env
             controller_host_name: controller-container
             service_host_name: service-container
             service_port: 3000
@@ -221,4 +223,51 @@ suites:
         specs:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-registered.specs.js
+      coverage: *disable-coverage
+    - name: service-changed-reconnection
+      describe: Service should update abilities if changed when connected again to controller
+      services:
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: console-changed
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: console-changed
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            env:
+              <<: *e2e-service-service-docker-env
+              service_port: 3050
+              fixture: console-changed
+          local:
+            <<: *e2e-service-service-local
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: console-changed
+              service_port: 3050
+      test:
+        local:
+          <<: *e2e-test-local
+          wait-on: tcp:localhost:3050
+          env:
+            <<: *e2e-test-local-env
+            service_port: 3050
+            fixture: console-changed
+        docker:
+          <<: *e2e-test-docker
+          wait-on: tcp:service-container:3050
+          env:
+            <<: *e2e-test-docker-env
+            service_port: 3050
+            fixture: console-changed
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/specs/console-changed.specs.js
       coverage: *disable-coverage

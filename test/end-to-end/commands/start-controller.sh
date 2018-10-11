@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 cd test/end-to-end/fixtures/${fixture}
 rm -rf ../../../../${domapic_path}/.domapic/controller/logs
 npm i
