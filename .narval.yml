@@ -344,15 +344,16 @@ suites:
           env:
             service_name: console
             domapic_path: .test
-        docker:
-          command: test/end-to-end/commands/clean-service-storage.sh
-          env:
-            service_name: console
-            domapic_path: .shared
       services:
         - *e2e-mongodb-service
         - *e2e-controller-service
-        - *e2e-service-service
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            env:
+              <<: *e2e-service-service-docker-env
+              domapic_path: .shared/.domapic
+          local: *e2e-service-service-local
       test:
         <<: *e2e-test
         specs:
@@ -377,4 +378,23 @@ suites:
           - test/end-to-end/specs/connection-api.specs.js
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-registered.specs.js
+      coverage: *disable-coverage
+    - name: connection-api-wrong-controller-api-key
+      describe: Service should not connect to controller when using connection api with wrong controller apiKey
+      before: *e2e-clean
+      services:
+        - *e2e-mongodb-service
+        - *e2e-controller-service
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            command: test/end-to-end/commands/start-service-no-controller-config.sh
+          local:
+            <<: *e2e-service-service-local
+            command: test/end-to-end/commands/start-service-no-controller-config.sh
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/connection-api-wrong-key.specs.js
+          - test/end-to-end/specs/not-connected.specs.js
       coverage: *disable-coverage
