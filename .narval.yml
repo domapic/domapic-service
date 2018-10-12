@@ -358,6 +358,7 @@ suites:
         <<: *e2e-test
         specs:
           - test/end-to-end/specs/service-repeated.specs.js
+          - test/end-to-end/specs/not-connected.specs.js
       coverage: *disable-coverage
     - name: connection-api
       describe: Service should connect to controller when using connection api
@@ -375,6 +376,8 @@ suites:
       test:
         <<: *e2e-test
         specs:
+          - test/end-to-end/specs/not-connected.specs.js
+          - test/end-to-end/specs/console-not-registered.specs.js
           - test/end-to-end/specs/connection-api.specs.js
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-registered.specs.js
@@ -397,4 +400,5 @@ suites:
         specs:
           - test/end-to-end/specs/connection-api-wrong-key.specs.js
           - test/end-to-end/specs/not-connected.specs.js
+          - test/end-to-end/specs/console-not-registered.specs.js
       coverage: *disable-coverage
