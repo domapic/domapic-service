@@ -37,7 +37,7 @@
       "put": {
         "tags": ["connection"],
         "summary": "Controller connection",
-        "description": "Updates controller connection data, and dispatches the connection command if it is active. Disconnect from controller if is not active",
+        "description": "Updates controller connection data, and dispatches the connection command if active field is true. Disconnect from controller if active field is false",
         "operationId": "connection",
         "requestBody": {
           "description": "Connection data",

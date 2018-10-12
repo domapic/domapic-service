@@ -71,7 +71,29 @@ const waitAndGetControllerApiKey = () => {
       getControllerApiKey().then(controllerApiKey => {
         resolve(controllerApiKey)
       })
-    }, 2000)
+    }, 1000)
+  })
+}
+
+const getServiceApiKey = () => {
+  return testUtils.logs.combined('service')
+    .then(log => {
+      const match = log.match(/Try adding connection from Controller, using the next service Api Key: (\S*)\n/)
+      if (match && match[1]) {
+        console.log(match[1])
+        return Promise.resolve(match[1])
+      }
+      return waitAndGetServiceApiKey()
+    })
+}
+
+const waitAndGetServiceApiKey = () => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      getServiceApiKey().then(serviceApiKey => {
+        resolve(serviceApiKey)
+      })
+    }, 1000)
   })
 }
 
@@ -107,6 +129,32 @@ class ControllerConnection {
   }
 }
 
+class ServiceConnection {
+  constructor () {
+    this._apiKey = null
+  }
+
+  async getApiKey () {
+    return getServiceApiKey()
+  }
+
+  async request (uri, options = {}) {
+    const method = options.method || 'GET'
+    if (!this._apiKey) {
+      this._apiKey = await this.getApiKey()
+    }
+    return request(`http://${SERVICE_HOST}:${SERVICE_PORT}/api${uri}`,
+      {
+        headers: {
+          'X-Api-Key': this._apiKey
+        },
+        method,
+        ...options
+      }
+    )
+  }
+}
+
 module.exports = {
   waitOnestimatedStartTime,
   request,
@@ -116,5 +164,7 @@ module.exports = {
   SERVICE_PORT,
   CONTROLLER_URL,
   getControllerApiKey,
-  ControllerConnection
+  getServiceApiKey,
+  ControllerConnection,
+  ServiceConnection
 }
