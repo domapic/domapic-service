@@ -230,6 +230,24 @@ suites:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-registered.specs.js
       coverage: *disable-coverage
+    - name: service-reconnection-no-config
+      describe: Service should connect again to controller when restarted, even when no config is provided
+      services:
+        - *e2e-mongodb-service
+        - *e2e-controller-service
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            command: test/end-to-end/commands/start-service-no-config.sh
+          local:
+            <<: *e2e-service-service-local
+            command: test/end-to-end/commands/start-service-no-config.sh
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/specs/console-registered.specs.js
+      coverage: *disable-coverage
     - name: service-changed-reconnection
       describe: Service should update abilities if changed when connected again to controller
       services:
