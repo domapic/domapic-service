@@ -2,8 +2,6 @@
 const test = require('narval')
 const testUtils = require('narval/utils')
 
-const utils = require('./utils')
-
 test.describe('when service finish connection process', function () {
   this.timeout(10000)
 
@@ -14,4 +12,3 @@ test.describe('when service finish connection process', function () {
       })
   })
 })
-

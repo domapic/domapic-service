@@ -12,7 +12,7 @@ test.describe('when using connection api to connect with controller with wrong c
       method: 'PUT',
       body: {
         active: true,
-        apiKey: "foo-api-key",
+        apiKey: 'foo-api-key',
         url: utils.CONTROLLER_URL
       }
     }).then(response => {
