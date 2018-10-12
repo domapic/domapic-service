@@ -60,7 +60,10 @@
           "503": {
             "$ref": "#/components/responses/ServerUnavailableError"
           }
-        }
+        },
+        "security": [{
+          "apiKey": []
+        }]
       }
     }
   }
