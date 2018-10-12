@@ -18,18 +18,18 @@ test.describe('when using connection api to connect with controller', function (
 
   test.it('should return response with current connection data', () => {
     return serviceConnection.request('/connection', {
-        method: 'PUT',
-        body: {
-          active: true,
-          apiKey: controllerApiKey,
-          url: utils.CONTROLLER_URL
-        }
-      }).then(response => {
-        return test.expect(response.body).to.deep.equal({
-          active: true,
-          apiKey: controllerApiKey,
-          url: utils.CONTROLLER_URL
-        })
+      method: 'PUT',
+      body: {
+        active: true,
+        apiKey: controllerApiKey,
+        url: utils.CONTROLLER_URL
+      }
+    }).then(response => {
+      return test.expect(response.body).to.deep.equal({
+        active: true,
+        apiKey: controllerApiKey,
+        url: utils.CONTROLLER_URL
       })
+    })
   })
 })
