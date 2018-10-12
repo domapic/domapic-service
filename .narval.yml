@@ -336,3 +336,25 @@ suites:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-ability-changed.specs.js
       coverage: *disable-coverage
+    - name: service-name-repeated
+      describe: Service should not connect to controller if service name is already defined
+      before:
+        local:
+          command: test/end-to-end/commands/clean-service-storage.sh
+          env:
+            service_name: console
+            domapic_path: .test
+        docker:
+          command: test/end-to-end/commands/clean-service-storage.sh
+          env:
+            service_name: console
+            domapic_path: .shared
+      services:
+        - *e2e-mongodb-service
+        - *e2e-controller-service
+        - *e2e-service-service
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/service-repeated.specs.js
+      coverage: *disable-coverage

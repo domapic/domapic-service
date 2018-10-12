@@ -87,9 +87,7 @@ class ControllerConnection {
         user: 'admin',
         password: 'admin'
       }
-    }).then(response => {
-      return Promise.resolve(response.body.accessToken)
-    })
+    }).then(response => Promise.resolve(response.body.accessToken))
   }
 
   async request (uri, options = {}) {
@@ -110,9 +108,9 @@ class ControllerConnection {
 }
 
 module.exports = {
-  waitOnestimatedStartTime: waitOnestimatedStartTime,
-  request: request,
-  readStorage: readStorage,
+  waitOnestimatedStartTime,
+  request,
+  readStorage,
   SERVICE_NAME,
   SERVICE_HOST,
   SERVICE_PORT,
