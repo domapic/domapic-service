@@ -6,21 +6,15 @@ const utils = require('./utils')
 
 test.describe('when using controller action api to dispatch service action', function () {
   let consoleAbilityId
-  let serviceId
   this.timeout(10000)
   const controllerConnection = new utils.ControllerConnection()
 
   test.before(() => {
-    return controllerConnection.request('/services')
+    return controllerConnection.request('/abilities')
       .then(response => {
-        const service = response.body.find(service => service.name === 'console')
-        serviceId = service._id
-         return controllerConnection.request('/abilities')
-          .then(response => {
-            const ability = response.body.find(ability => ability.name === 'stdout')
-            consoleAbilityId = ability._id
-            return Promise.resolve();
-          })
+        const ability = response.body.find(ability => ability.name === 'stdout')
+        consoleAbilityId = ability._id
+        return Promise.resolve()
       })
   })
 
