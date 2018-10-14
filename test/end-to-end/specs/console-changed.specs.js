@@ -46,11 +46,10 @@ test.describe('when connection with controller is successful', function () {
           test.expect(ability.state).to.equal(true),
           test.expect(ability.description).to.equal('Handle console log version 2'),
           test.expect(ability.type).to.equal('string'),
-          test.expect(ability.maxLength).to.equal(1)
-          // TODO, expose this fields in controller
-          // test.expect(ability.actionDescription).to.equal('Print the received character into console 2'),
-          // test.expect(ability.stateDescription).to.equal('Last character printed in console 2'),
-          // test.expect(ability.eventDescription).to.equal('Console has just printed a character 2')
+          test.expect(ability.maxLength).to.equal(1),
+          test.expect(ability.actionDescription).to.equal('Print the received character into console version 2'),
+          test.expect(ability.stateDescription).to.equal('Last character printed in console version 2'),
+          test.expect(ability.eventDescription).to.equal('Console has just printed a character version 2')
         ])
       })
   })
