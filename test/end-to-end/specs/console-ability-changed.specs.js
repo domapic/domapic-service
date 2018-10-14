@@ -47,11 +47,10 @@ test.describe('when connection with controller was successful', function () {
           test.expect(ability.description).to.equal('Handle stdout'),
           test.expect(ability.type).to.equal('number'),
           test.expect(ability.maximum).to.equal(5),
-          test.expect(ability.minimum).to.equal(2)
-          // TODO, expose this fields in controller
-          // test.expect(ability.actionDescription).to.equal('Print the received character into stdout'),
-          // test.expect(ability.stateDescription).to.equal('Last character printed in stdout'),
-          // test.expect(ability.eventDescription).to.equal(undefined)
+          test.expect(ability.minimum).to.equal(2),
+          test.expect(ability.actionDescription).to.equal('Print the received character into stdout'),
+          test.expect(ability.stateDescription).to.equal('Last character printed in stdout'),
+          test.expect(ability.eventDescription).to.equal(undefined)
         ])
       })
   })
