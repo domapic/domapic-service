@@ -7,7 +7,7 @@ const domapic = require('../../../../index')
 new domapic.Service({
   packagePath: path.resolve(__dirname)
 }).then((service) => {
-  let lastCharacter = ''
+  let lastCharacter
 
   const consoleLog = function (data) {
     lastCharacter = data
@@ -15,24 +15,23 @@ new domapic.Service({
   }
 
   return service.register({
-    console: {
-      description: 'Handle console log',
+    stdout: {
+      description: 'Handle stdout',
       data: {
-        type: 'string',
-        maxLength: 1
-      },
-      event: {
-        description: 'Console has just printed a character'
+        type: 'number',
+        maximum: 5,
+        minimum: 2
       },
       state: {
-        description: 'Last character printed in console',
-        auth: false,
+        description: 'Last character printed in stdout',
+        auth: false, // default true
         handler: () => {
           return Promise.resolve(lastCharacter)
         }
       },
       action: {
-        description: 'Print the received character into console',
+        description: 'Print the received character into stdout',
+        auth: false,
         handler: (data) => {
           consoleLog(data)
           return Promise.resolve(data)

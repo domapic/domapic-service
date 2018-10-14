@@ -8,7 +8,7 @@ test.describe('when service starts and connection options are provided', functio
   this.timeout(10000)
 
   test.it('should have connected to the controller', () => {
-    return utils.waitOnestimatedStartTime(2000)
+    return utils.waitOnestimatedStartTime(5000)
       .then(() => {
         return testUtils.logs.combined('service')
           .then((log) => {

@@ -1,7 +1,7 @@
 {
-  "name": "handle-console-domapic",
+  "name": "handle-stdout-domapic",
   "version": "1.0.0",
-  "description": "Example of Node.js Domapic service that handles console",
+  "description": "Example of Node.js Domapic service with another ability",
   "dependencies": {
     "domapic-service": "file:../../../../"
   },
