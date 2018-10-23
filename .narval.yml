@@ -218,6 +218,7 @@ suites:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-registered.specs.js
           - test/end-to-end/specs/controller-action-handler.specs.js
+          - test/end-to-end/specs/controller-state-handler.specs.js
       coverage: *disable-coverage
     - name: service-reconnection
       describe: Service should connect again to controller when restarted
@@ -231,6 +232,7 @@ suites:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-registered.specs.js
           - test/end-to-end/specs/controller-action-handler.specs.js
+          - test/end-to-end/specs/controller-state-handler.specs.js
       coverage: *disable-coverage
     - name: service-reconnection-no-config
       describe: Service should connect again to controller when restarted, even when no config is provided
@@ -250,6 +252,7 @@ suites:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-registered.specs.js
           - test/end-to-end/specs/controller-action-handler.specs.js
+          - test/end-to-end/specs/controller-state-handler.specs.js
       coverage: *disable-coverage
     - name: service-changed-reconnection
       describe: Service should update abilities if changed when connected again to controller
@@ -304,6 +307,7 @@ suites:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-changed.specs.js
           - test/end-to-end/specs/controller-action-handler.specs.js
+          - test/end-to-end/specs/controller-state-handler.specs.js
       coverage: *disable-coverage
     - name: service-ability-changed-reconnection
       describe: Service should delete and create ability again if changed name or another sensible data
@@ -358,6 +362,7 @@ suites:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-ability-changed.specs.js
           - test/end-to-end/specs/controller-action-changed-handler.specs.js
+          - test/end-to-end/specs/controller-state-changed-handler.specs.js
       coverage: *disable-coverage
     - name: service-name-repeated
       describe: Service should not connect to controller if service name is already defined
@@ -405,6 +410,7 @@ suites:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-registered.specs.js
           - test/end-to-end/specs/controller-action-handler.specs.js
+          - test/end-to-end/specs/controller-state-handler.specs.js
       coverage: *disable-coverage
     - name: connection-api-wrong-controller-api-key
       describe: Service should not connect to controller when using connection api with wrong controller apiKey
