@@ -12,7 +12,6 @@ new domapic.Service({
   const consoleLog = function (data) {
     lastCharacter = data
     console.log(`Printing into console: ${data}`)
-    service.emit('stdout', data)
   }
 
   return service.register({
