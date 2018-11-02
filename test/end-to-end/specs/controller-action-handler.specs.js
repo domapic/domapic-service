@@ -59,4 +59,30 @@ test.describe('when using controller action api to dispatch service action', fun
         })
     })
   })
+
+  test.it('should trigger related event, and it should be saved into controller database', () => {
+    const fooConsoleData = {
+      data: 'y'
+    }
+    return controllerConnection.request(`/abilities/${consoleAbilityId}/action`, {
+      method: 'POST',
+      body: fooConsoleData
+    }).then(response => {
+      return utils.waitOnestimatedStartTime(200)
+        .then(() => {
+          return controllerConnection.request(`/logs`, {
+            method: 'GET'
+          }).then(logsResponse => {
+            const actionLog = logsResponse.body.find(log => log.data === 'y' && log.type === 'action')
+            const eventLog = logsResponse.body.find(log => log.data === 'y' && log.type === 'event')
+            return Promise.all([
+              test.expect(logsResponse.body.length).to.equal(4),
+              test.expect(logsResponse.statusCode).to.equal(200),
+              test.expect(actionLog).to.not.be.undefined(),
+              test.expect(eventLog).to.not.be.undefined()
+            ])
+          })
+        })
+    })
+  })
 })
