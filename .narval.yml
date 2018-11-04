@@ -13,12 +13,14 @@ schemas:
         service_port: 3100
         service_host_name: localhost
         domapic_path: .test
+        fixture: console
       docker-service: &docker-service-env
         controller_host_name: controller-container
         service_port: 3000
         service_host_name: service-container
         domapic_path: .shared
         service_extra_options: --authDisabled=172.0.0.0/8
+        fixture: console
     clean: &clean
       local:
         command: test/functional/commands/local-clean.sh
@@ -29,16 +31,21 @@ schemas:
       local-service: &local-service
         command: test/functional/commands/start-service.sh
         env: *local-service-env
-      local-service-wait: &local-service-wait
-        <<: *local-service
-        wait-on: tcp:localhost:3000
+      local-service-auth: &local-service-auth
+        command: test/functional/commands/start-service.sh
+        env: &local-service-auth-env
+          <<: *local-service-env
+          service_extra_options: --authDisabled
       docker-service: &docker-service
         container: service-container
         command: test/functional/commands/start-service.sh
         env: *docker-service-env
-      docker-service-wait: &docker-service-wait
-        <<: *docker-service
-        wait-on: tcp:controller-container:3000
+      docker-service-auth: &docker-service-auth
+        container: service-container
+        command: test/functional/commands/start-service.sh
+        env: &docker-service-auth-env
+          <<: *docker-service-env
+          service_extra_options: --authDisabled
     test: &functional-test
       local:
         wait-on: tcp:localhost:3100
@@ -203,6 +210,42 @@ suites:
           - test/functional/specs/not-connected.specs.js
           - test/functional/specs/connection-api-unavailable.specs.js
           - test/functional/specs/not-connected.specs.js
+      coverage: *disable-coverage
+    - name: authentication-enabled
+      describe: should not allow to use abilities api to no authenticated users
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+          docker:
+            <<: *docker-service-auth
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/auth-enabled.specs.js
+      coverage: *disable-coverage
+    - name: authentication-disabled
+      describe: should allow to use abilities api to no authenticated users
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            env:
+              <<: *local-service-auth-env
+              fixture: console-auth-disabled
+          docker:
+            <<: *docker-service-auth
+            env:
+              <<: *docker-service-auth-env
+              fixture: console-auth-disabled
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/auth-disabled.specs.js
       coverage: *disable-coverage
   end-to-end:
     - name: service-connection

@@ -50,8 +50,34 @@ const readStorage = function (file = 'storage') {
     })
 }
 
+const controllerApiKey = (property, value) => readStorage()
+  .then(data => Promise.resolve(data.apiKeys.find(apiKeyData => apiKeyData.user === 'controller')))
+
+class Connection {
+  constructor () {
+    this._apiKey = null
+  }
+
+  async request (uri, options = {}) {
+    const method = options.method || 'GET'
+    if (!this._apiKey) {
+      this._apiKey = await controllerApiKey()
+    }
+    return request(uri,
+      {
+        headers: {
+          'X-Api-Key': this._apiKey.key
+        },
+        method,
+        ...options
+      }
+    )
+  }
+}
+
 module.exports = {
-  waitOnestimatedStartTime: waitOnestimatedStartTime,
-  request: request,
-  readStorage: readStorage
+  waitOnestimatedStartTime,
+  request,
+  readStorage,
+  Connection
 }
