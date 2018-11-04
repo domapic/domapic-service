@@ -21,24 +21,6 @@ new domapic.Service({
     console: {
       description: 'Handle custom console logs',
       data: {
-        // type: 'string'
-        // format: 'email'
-        // enum: ['dasdad', 'asdad']
-        // maxLength: 12,
-        // minLength: 5,
-        // pattern: '^testing'
-
-        // type: 'number',
-        // type: 'float',
-        // type: 'integer',
-        // enum: [10, 20, 30],
-        // multipleOf: 10,
-        // minimum: 11,
-        // maximum: 25,
-        // exclusiveMaximum: true,
-        // exclusiveMinimum: true
-        // TODO, check allowed schema properties for string
-
         type: 'boolean'
       },
       event: {

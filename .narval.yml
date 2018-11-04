@@ -290,6 +290,8 @@ suites:
           - test/functional/specs/ability-boolean.specs.js
           - test/functional/specs/ability-string.specs.js
           - test/functional/specs/ability-string-enum.specs.js
+          - test/functional/specs/ability-number.specs.js
+          - test/functional/specs/ability-number-enum.specs.js
       coverage: *disable-coverage
   end-to-end:
     - name: service-connection
