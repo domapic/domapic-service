@@ -26,7 +26,8 @@ test.describe('abilities with auth disabled', () => {
               .then((log) => {
                 return PromiseB.all([
                   test.expect(response.statusCode).to.equal(200),
-                  test.expect(log).to.contain(`Console Called: true`)
+                  test.expect(log).to.contain(`Console Called: true`),
+                  test.expect(log).to.contain(`Error sending "console" event: The service is not connected to Controller`)
                 ])
               })
           })
