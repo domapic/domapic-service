@@ -268,6 +268,27 @@ suites:
         specs:
           - test/functional/specs/wrong-ability.specs.js
       coverage: *disable-coverage
+    - name: ability-data-types
+      describe: should work as expected and validate data for each type of ability data
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            env:
+              <<: *local-service-auth-env
+              fixture: multiple-abilities
+          docker:
+            <<: *docker-service-auth
+            env:
+              <<: *docker-service-auth-env
+              fixture: multiple-abilities
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/ability-boolean.specs.js
+      coverage: *disable-coverage
   end-to-end:
     - name: service-connection
       describe: Service should connect to controller when started first time if connection options are provided
