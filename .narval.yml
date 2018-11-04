@@ -247,6 +247,27 @@ suites:
         specs:
           - test/functional/specs/auth-disabled.specs.js
       coverage: *disable-coverage
+    - name: wrong-ability
+      describe: should throw an error when trying to register a wrong ability
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            env:
+              <<: *local-service-auth-env
+              fixture: wrong-ability
+          docker:
+            <<: *docker-service-auth
+            env:
+              <<: *docker-service-auth-env
+              fixture: wrong-ability
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/wrong-ability.specs.js
+      coverage: *disable-coverage
   end-to-end:
     - name: service-connection
       describe: Service should connect to controller when started first time if connection options are provided
