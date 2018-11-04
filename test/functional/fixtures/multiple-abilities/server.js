@@ -45,8 +45,8 @@ new domapic.Service({
       data: {
         type: 'string',
         format: 'email',
-        maxLength: 10,
-        minLength: 5,
+        maxLength: 15,
+        minLength: 11,
         pattern: '^foo'
       },
       event: {
@@ -71,16 +71,6 @@ new domapic.Service({
       data: {
         type: 'string',
         enum: ['foo1', 'foo2']
-        // type: 'number',
-        // type: 'float',
-        // type: 'integer',
-        // enum: [10, 20, 30],
-        // multipleOf: 10,
-        // minimum: 11,
-        // maximum: 25,
-        // exclusiveMaximum: true,
-        // exclusiveMinimum: true
-        // TODO, check allowed schema properties for string
       },
       event: {
         description: 'Console has just printed an string from enum'
