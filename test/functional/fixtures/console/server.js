@@ -11,30 +11,29 @@ new domapic.Service({
 
   const consoleLog = function (data) {
     lastCharacter = data
-    console.log(`Printing into console: ${data}`)
-    service.emit('console', data)
+    service.tracer.info('Console Called:', data)
+      .then(() => {
+        service.emit('console', data)
+      })
   }
 
   return service.register({
     console: {
-      description: 'Handle console log version 2',
+      description: 'Handle custom console logs',
       data: {
-        type: 'string',
-        maxLength: 1
+        type: 'boolean'
       },
       event: {
-        description: 'Console has just printed a character version 2'
+        description: 'Console has just printed a character'
       },
       state: {
-        description: 'Last character printed in console version 2',
-        auth: false, // default true
+        description: 'Last character printed in console',
         handler: () => {
           return Promise.resolve(lastCharacter)
         }
       },
       action: {
-        description: 'Print the received character into console version 2',
-        auth: false,
+        description: 'Print the received character into console',
         handler: (data) => {
           consoleLog(data)
           return Promise.resolve(data)

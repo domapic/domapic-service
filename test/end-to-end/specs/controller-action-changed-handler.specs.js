@@ -1,4 +1,5 @@
 
+const _ = require('lodash')
 const test = require('narval')
 const testUtils = require('narval/utils')
 
@@ -56,6 +57,29 @@ test.describe('when using controller action api to dispatch service action', fun
                 test.expect(log).to.contain(`Printing into console: ${fooConsoleData.data}`)
               ])
             })
+        })
+    })
+  })
+
+  test.it('should trigger related event, and it should be saved into controller database', () => {
+    const fooConsoleData = {
+      data: _.random(2, 4)
+    }
+    return controllerConnection.request(`/abilities/${consoleAbilityId}/action`, {
+      method: 'POST',
+      body: fooConsoleData
+    }).then(response => {
+      return utils.waitOnestimatedStartTime(200)
+        .then(() => {
+          return controllerConnection.request(`/logs`, {
+            method: 'GET'
+          }).then(logsResponse => {
+            const actionLog = logsResponse.body.find(log => log.data === fooConsoleData.data && log.type === 'action')
+            return Promise.all([
+              test.expect(logsResponse.statusCode).to.equal(200),
+              test.expect(actionLog).to.not.be.undefined()
+            ])
+          })
         })
     })
   })

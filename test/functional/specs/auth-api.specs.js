@@ -15,7 +15,7 @@ const findApiKey = function (property, value) {
 }
 
 test.describe('auth api', () => {
-  test.describe.only('post method', () => {
+  test.describe('post method', () => {
     test.it('should add a new api key with the provided data', () => {
       return utils.request('/auth/apikey', {
         method: 'POST',
@@ -87,11 +87,8 @@ test.describe('auth api', () => {
     test.it('should delete the provided api key', () => {
       return findApiKey('reference', 'foo-api-key-2')
         .then((apiKey) => {
-          return utils.request('/auth/apikey', {
-            method: 'DELETE',
-            body: {
-              apiKey: apiKey.key
-            }
+          return utils.request(`/auth/apikey/${apiKey.key}`, {
+            method: 'DELETE'
           }).then((response) => {
             return PromiseB.props({
               previous: findApiKey('reference', 'foo-api-key'),
@@ -107,11 +104,8 @@ test.describe('auth api', () => {
     })
 
     test.it('should return an error if the provided key does not exist', () => {
-      return utils.request('/auth/apikey', {
-        method: 'DELETE',
-        body: {
-          apiKey: 'fakeApiKey'
-        }
+      return utils.request(`/auth/apikey/fakeApiKey`, {
+        method: 'DELETE'
       }).then((response) => {
         return test.expect(response.statusCode).to.equal(422)
       })

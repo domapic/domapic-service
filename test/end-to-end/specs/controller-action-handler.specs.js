@@ -1,8 +1,15 @@
 
+const _ = require('lodash')
 const test = require('narval')
 const testUtils = require('narval/utils')
 
 const utils = require('./utils')
+
+const randomChar = () => {
+  const chars = 'abcdefghijklmnopqrstuvwxyz'
+  const pos = _.random(0, chars.length - 1)
+  return chars.substring(pos, pos + 1)
+}
 
 test.describe('when using controller action api to dispatch service action', function () {
   let consoleAbilityId
@@ -56,6 +63,31 @@ test.describe('when using controller action api to dispatch service action', fun
                 test.expect(log).to.contain(`Printing into console: ${fooConsoleData.data}`)
               ])
             })
+        })
+    })
+  })
+
+  test.it('should trigger related event, and it should be saved into controller database', () => {
+    const fooConsoleData = {
+      data: randomChar()
+    }
+    return controllerConnection.request(`/abilities/${consoleAbilityId}/action`, {
+      method: 'POST',
+      body: fooConsoleData
+    }).then(response => {
+      return utils.waitOnestimatedStartTime(200)
+        .then(() => {
+          return controllerConnection.request(`/logs`, {
+            method: 'GET'
+          }).then(logsResponse => {
+            const actionLog = logsResponse.body.find(log => log.data === fooConsoleData.data && log.type === 'action')
+            const eventLog = logsResponse.body.find(log => log.data === fooConsoleData.data && log.type === 'event')
+            return Promise.all([
+              test.expect(logsResponse.statusCode).to.equal(200),
+              test.expect(actionLog).to.not.be.undefined(),
+              test.expect(eventLog).to.not.be.undefined()
+            ])
+          })
         })
     })
   })
