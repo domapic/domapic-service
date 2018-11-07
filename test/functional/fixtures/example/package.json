@@ -1,0 +1,8 @@
+{
+  "name": "relay-domapic",
+  "version": "1.0.0",
+  "description": "Domapic module controlling a relay",
+  "dependencies": {
+    "domapic-service": "file:../../../../"
+  }
+}
