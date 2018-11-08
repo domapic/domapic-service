@@ -65,7 +65,7 @@ Modules can be created with few lines of code. Here is an example of a module co
 const path = require('path')
 const domapic = require('domapic-service')
 
-domapic.createModule({ packagePath: path.resolve(__dirname)})
+domapic.createModule({ packagePath: path.resolve(__dirname) })
   .then(async module => {
     let status = false
 

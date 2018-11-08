@@ -1,6 +1,5 @@
 
 const test = require('narval')
-const testUtils = require('narval/utils')
 
 const utils = require('./utils')
 
