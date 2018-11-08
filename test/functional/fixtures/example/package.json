@@ -4,5 +4,8 @@
   "description": "Domapic module controlling a relay",
   "dependencies": {
     "domapic-service": "file:../../../../"
+  },
+  "scripts": {
+    "relay": "./cli"
   }
 }
