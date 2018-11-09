@@ -1,5 +1,5 @@
 {
-  "name": "relay-domapic",
+  "name": "relay-domapic-module",
   "version": "1.0.0",
   "description": "Domapic module controlling a relay",
   "dependencies": {

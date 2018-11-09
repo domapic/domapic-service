@@ -3,7 +3,7 @@ const test = require('narval')
 
 const utils = require('./utils')
 
-test.describe('when starting documentation example', function () {
+test.describe('when starting module from documentation example', function () {
   this.timeout(10000)
   let connection
 
