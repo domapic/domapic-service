@@ -311,7 +311,7 @@ Server logs are saved too into a daily file. These files are rotated automatical
 
 [domapic-logo-image]: http://domapic.com/assets/domapic-logo.png
 [domapic-example-image]: http://domapic.com/assets/domapic-schema-example_01.png
-[swagger-example-image]: swagger-example.jpg
+[swagger-example-image]: http://domapic.com/assets/swagger-example.jpg
 
 [coveralls-image]: https://coveralls.io/repos/github/domapic/domapic-service/badge.svg?branch=master
 [coveralls-url]: https://coveralls.io/github/domapic/domapic-service
