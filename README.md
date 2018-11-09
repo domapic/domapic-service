@@ -80,7 +80,7 @@ domapic.createModule({ packagePath: path.resolve(__dirname) })
         },
         state: {
           description: 'Current relay status',
-          handler: () => Promise.resolve(status)
+          handler: () => status
         },
         action: {
           description: 'Switch on/off the relay',
@@ -134,11 +134,11 @@ Each ability must be an object, which key will be the name of the ability (will 
 	* `description` `<string>` Description of the ability event.
 * `state` `<object>` Optional. If present, the ability will have an api resource for consulting the state.
 	* `description` `<string>` Description of the ability state.
-	* `handler` `<function>` Handler for the state api resource. A promise resolving the state must be returned.
+	* `handler` `<function>` Handler for the state api resource. The status, or a promise resolving the status must be returned.
 	* `auth` `<boolean>` If false, the state api resource will not demand authentication. Default is `true`.
 * `action` `<object>` Optional. If present, the ability will have an api resource for dispatching the action.
 	* `description` `<string>` Description of the ability action.
-	* `handler` `<function>` Handler for the action api resource. Will receive the action data as argument. A promise resolving the state must be returned.
+	* `handler` `<function>` Handler for the action api resource. Will receive the action data as argument. The status, or a promise resolving the status must be returned.
 	* `auth` `<boolean>` If false, the action api resource will not demand authentication. Default is `true`.
 
 #### Action
