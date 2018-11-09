@@ -20,5 +20,6 @@ const Service = function (serviceOptions) {
 }
 
 module.exports = {
-  Service: Service
+  Service: Service,
+  cli: domapic.cli
 }

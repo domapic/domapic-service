@@ -293,6 +293,27 @@ suites:
           - test/functional/specs/ability-number.specs.js
           - test/functional/specs/ability-number-enum.specs.js
       coverage: *disable-coverage
+    - name: documentation-example
+      describe: documentation example should work as expected
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            env:
+              <<: *local-service-auth-env
+              fixture: example
+          docker:
+            <<: *docker-service-auth
+            env:
+              <<: *docker-service-auth-env
+              fixture: example
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/example-api.specs.js
+      coverage: *disable-coverage
   end-to-end:
     - name: service-connection
       describe: Service should connect to controller when started first time if connection options are provided
