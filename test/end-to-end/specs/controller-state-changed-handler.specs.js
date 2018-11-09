@@ -4,7 +4,7 @@ const testUtils = require('narval/utils')
 
 const utils = require('./utils')
 
-test.describe('when using controller state api to get service ability state', function () {
+test.describe('when using controller state api to get module ability state', function () {
   let consoleAbilityId
   this.timeout(10000)
   const controllerConnection = new utils.ControllerConnection()

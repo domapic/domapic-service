@@ -8,7 +8,7 @@ test.describe('when connection with controller failed', function () {
 
   const controllerConnection = new utils.ControllerConnection()
 
-  test.it('console service user should not be registered in controller', () => {
+  test.it('console module user should not be registered in controller', () => {
     return controllerConnection.request('/users')
       .then(response => {
         const service = response.body.find(service => service.name === 'console')
@@ -17,7 +17,7 @@ test.describe('when connection with controller failed', function () {
   })
 
   test.it('console have no services registered in controller', () => {
-    return controllerConnection.request('/services')
+    return controllerConnection.request('/modules')
       .then(response => {
         return test.expect(response.body.length).to.equal(0)
       })
