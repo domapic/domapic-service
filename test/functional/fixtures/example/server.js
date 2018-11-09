@@ -3,7 +3,7 @@
 const path = require('path')
 const domapic = require('../../../../index')
 
-domapic.Service({ packagePath: path.resolve(__dirname) })
+domapic.createModule({ packagePath: path.resolve(__dirname) })
   .then(async module => {
     let status = false
 

@@ -4,7 +4,7 @@ const path = require('path')
 
 const domapic = require('../../../../index')
 
-new domapic.Service({
+domapic.createModule({
   packagePath: path.resolve(__dirname)
 }).then((service) => {
   return service.register({
