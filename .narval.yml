@@ -1,65 +1,137 @@
 schemas:
-  envs:
-    local-service: &local-service-env
-      controller_host_name: localhost
-      service_port: 3100
-      service_host_name: localhost
-      domapic_path: .test
-    docker-service: &docker-service-env
-      controller_host_name: controller-container
-      service_port: 3000
-      service_host_name: service-container
-      domapic_path: .shared
-      service_extra_options: --authDisabled=172.0.0.0/8
-    local-controller: &local-controller-env
-      controller_host_name: localhost
-      domapic_path: .test
-    docker-controller: &docker-controller-env
-      controller_host_name: controller-container
-      domapic_path: .shared
-      controller_extra_options: --authDisabled=172.0.0.0/8 --logLevel=debug
   bind: &bind
     - lib
     - test
     - cli
     - index.js
-  integration:
+  coverage: &disable-coverage
+      enabled: false
+  functional:
+    envs:
+      local-service: &local-service-env
+        controller_host_name: localhost
+        service_port: 3100
+        service_host_name: localhost
+        domapic_path: .test
+        fixture: console
+      docker-service: &docker-service-env
+        controller_host_name: controller-container
+        service_port: 3000
+        service_host_name: service-container
+        domapic_path: .shared
+        service_extra_options: --authDisabled=172.0.0.0/8
+        fixture: console
     clean: &clean
       local:
-        command: test/integration/commands/clean.sh
+        command: test/functional/commands/local-clean.sh
       docker:
+        command: test/functional/commands/clean.sh
         down-volumes: true
-    coverage: &integration-coverage
-      enabled: false
     services:
       local-service: &local-service
-        command: test/integration/commands/start-service.sh
+        command: test/functional/commands/start-service.sh
         env: *local-service-env
-      local-service-wait: &local-service-wait
-        <<: *local-service
-        wait-on: tcp:localhost:3000
+      local-service-auth: &local-service-auth
+        command: test/functional/commands/start-service.sh
+        env: &local-service-auth-env
+          <<: *local-service-env
+          service_extra_options: --authDisabled
       docker-service: &docker-service
         container: service-container
-        command: test/integration/commands/start-service.sh
+        command: test/functional/commands/start-service.sh
         env: *docker-service-env
-      docker-service-wait: &docker-service-wait
-        <<: *docker-service
-        wait-on: tcp:controller-container:3000
-      local-controller: &local-controller
-        command: test/integration/commands/start-controller.sh
-        env: *local-controller-env
-      docker-controller: &docker-controller
-        container: controller-container
-        command: test/integration/commands/start-controller.sh
-        env: *docker-controller-env
-    test: &integration-test
-      local:
+      docker-service-auth: &docker-service-auth
+        container: service-container
+        command: test/functional/commands/start-service.sh
+        env: &docker-service-auth-env
+          <<: *docker-service-env
+          service_extra_options: --authDisabled
+    test: &functional-test
+      local: &functional-test-local
         wait-on: tcp:localhost:3100
         env: *local-service-env
-      docker:
+      docker: &functional-test-docker
         container: test-container
         wait-on: tcp:service-container:3000
         env: *docker-service-env
+  end-to-end:
+    before: &e2e-clean
+      local:
+        command: test/end-to-end/commands/local-clean.sh
+      docker:
+        down-volumes: true
+    services:
+      mongodb: &e2e-mongodb-service
+        name: mongodb
+        docker:
+          container: mongodb-container
+          command: test/end-to-end/commands/mongodb-docker.sh
+          env:
+            domapic_path: .shared
+      controller: &e2e-controller-service
+        name: controller
+        docker: &e2e-controller-service-docker
+          container: controller-container
+          command: test/end-to-end/commands/start-controller.sh
+          wait-on: tcp:mongodb-container:27017
+          env: &e2e-controller-service-docker-env
+            controller_host_name: controller-container
+            fixture: console
+            domapic_path: .shared
+            db_uri: mongodb://mongodb-container:27017/domapic
+        local: &e2e-controller-service-local
+          command: test/end-to-end/commands/start-controller.sh
+          wait-on: tcp:localhost:27017
+          env: &e2e-controller-service-local-env
+            controller_host_name: localhost
+            fixture: console
+            domapic_path: .test
+            db_uri: mongodb://localhost:27017/domapic
+      service: &e2e-service-service
+        name: service
+        docker: &e2e-service-service-docker
+          container: service-container
+          command: test/end-to-end/commands/start-service.sh
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:controller-container:3000
+          env:  &e2e-service-service-docker-env
+            controller_host_name: controller-container
+            service_host_name: service-container
+            service_port: 3000
+            service_name: console
+            fixture: console
+            domapic_path: .shared
+        local: &e2e-service-service-local
+          command: test/end-to-end/commands/start-service.sh
+          wait-on: tcp:localhost:3000
+          env: &e2e-service-service-local-env
+            controller_host_name: localhost
+            service_host_name: localhost
+            service_port: 3100
+            service_name: console
+            fixture: console
+            domapic_path: .test
+      test: &e2e-test
+        local: &e2e-test-local
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:localhost:3100
+          env: &e2e-test-local-env
+            controller_host_name: localhost
+            service_host_name: localhost
+            service_port: 3100
+            fixture: console
+        docker: &e2e-test-docker
+          container: test-container
+          wait-on: tcp:service-container:3000
+          env: &e2e-test-docker-env
+            controller_host_name: controller-container
+            service_host_name: service-container
+            service_port: 3000
+            fixture: console
 docker-images:
   - name: node-image
     from: node:8.11.1
@@ -67,7 +139,12 @@ docker-images:
       - 3000
     add:
       - package.json
-    install: test/integration/commands/install.sh
+      - package-lock.json
+    install: test/functional/commands/install.sh
+  - name: mongodb-image
+    from: mongo:3.6.4
+    expose:
+      - 27017
 docker-containers:
   - name: controller-container
     build: node-image
@@ -78,6 +155,9 @@ docker-containers:
   - name: test-container
     build: node-image
     bind: *bind
+  - name: mongodb-container
+    build: mongodb-image
+    bind: *bind
 suites:
   unit:
     - name: unit 
@@ -86,7 +166,7 @@ suites:
       coverage:
         config:
           dir: .coverage/unit
-  integration:
+  functional:
     - name: no-controller-provided
       describe: should print an api key valid to launch a pairing command from controller
       before: *clean
@@ -96,11 +176,11 @@ suites:
           local: *local-service
           docker: *docker-service
       test:
-        <<: *integration-test
+        <<: *functional-test
         specs:
-          - test/integration/specs/no-controller-api-key.specs.js
-          - test/integration/specs/not-connected.specs.js
-      coverage: *integration-coverage
+          - test/functional/specs/no-controller-api-key.specs.js
+          - test/functional/specs/not-connected.specs.js
+      coverage: *disable-coverage
     - name: auth-api
       describe: should add or remove api keys
       before: *clean
@@ -110,99 +190,386 @@ suites:
           local: *local-service
           docker: *docker-service
       test:
-        <<: *integration-test
-        specs: test/integration/specs/auth-api.specs.js
-      coverage: *integration-coverage
-    - name: controller-register
-      describe: should register the service in controller when started 
+        <<: *functional-test
+        specs: test/functional/specs/auth-api.specs.js
+      coverage: *disable-coverage
+    - name: connection-api-unavailable
+      describe: should try to connect to controller when calling to connection api, and return server unavailable if controller is unavailable
       before: *clean
       services:
-        - name: domapic-controller
-          local: *local-controller
-          docker: *docker-controller
         - name: domapic-service
           abort-on-error: true
           local:
-            <<: *local-service-wait
-            env:
-              <<: *local-service-env
-              service_extra_options: --controller=http://localhost:3000 --logLevel=debug
+            <<: *local-service
           docker:
-            <<: *docker-service-wait
-            env:
-              <<: *docker-service-env
-              service_extra_options: --controller=http://controller-container:3000 --logLevel=debug
+            <<: *docker-service
       test:
-        <<: *integration-test
+        <<: *functional-test
         specs:
-          - test/integration/specs/controller-register.specs.js
-          - test/integration/specs/connected.specs.js
-      coverage: *integration-coverage
-    - name: update-abilities
-      describe: should update abilities in controller when have changed
+          - test/functional/specs/no-controller-api-key.specs.js
+          - test/functional/specs/not-connected.specs.js
+          - test/functional/specs/connection-api-unavailable.specs.js
+          - test/functional/specs/not-connected.specs.js
+      coverage: *disable-coverage
+    - name: authentication-enabled
+      describe: should not allow to use abilities api to no authenticated users
       before: *clean
       services:
-        - name: domapic-controller
-          local:
-            <<: *local-controller
-            env:
-              <<: *local-controller-env
-              get_abilities_handler: update
-              get_service_handler: exists
-          docker:
-            <<: *docker-controller
-            env:
-              <<: *docker-controller-env
-              get_abilities_handler: update
-              get_service_handler: exists
         - name: domapic-service
           abort-on-error: true
           local:
-            <<: *local-service-wait
-            env:
-              <<: *local-service-env
-              service_extra_options: --controller=http://localhost:3000 --logLevel=debug
+            <<: *local-service-auth
           docker:
-            <<: *docker-service-wait
-            env:
-              <<: *docker-service-env
-              service_extra_options: --controller=http://controller-container:3000 --logLevel=debug
+            <<: *docker-service-auth
       test:
-        <<: *integration-test
+        <<: *functional-test
         specs:
-          - test/integration/specs/update-abilities.specs.js
-          - test/integration/specs/connected.specs.js
-      coverage: *integration-coverage
-    - name: name-already-exists
-      describe: should reject connection to controller when another registered service has the same name
+          - test/functional/specs/auth-enabled.specs.js
+      coverage: *disable-coverage
+    - name: authentication-disabled
+      describe: should allow to use abilities api to no authenticated users
       before: *clean
       services:
-        - name: domapic-controller
-          local:
-            <<: *local-controller
-            env:
-              <<: *local-controller-env
-              get_service_handler: exists-different-id
-          docker:
-            <<: *docker-controller
-            env:
-              <<: *docker-controller-env
-              get_service_handler: exists-different-id
         - name: domapic-service
           abort-on-error: true
           local:
-            <<: *local-service-wait
+            <<: *local-service-auth
             env:
-              <<: *local-service-env
-              service_extra_options: --controller=http://localhost:3000 --logLevel=debug
+              <<: *local-service-auth-env
+              fixture: console-auth-disabled
           docker:
-            <<: *docker-service-wait
+            <<: *docker-service-auth
             env:
-              <<: *docker-service-env
-              service_extra_options: --controller=http://controller-container:3000 --logLevel=debug
+              <<: *docker-service-auth-env
+              fixture: console-auth-disabled
       test:
-        <<: *integration-test
-        specs: 
-          - test/integration/specs/name-already-exists.specs.js
-          - test/integration/specs/not-connected.specs.js
-      coverage: *integration-coverage
+        <<: *functional-test
+        specs:
+          - test/functional/specs/auth-disabled.specs.js
+      coverage: *disable-coverage
+    - name: wrong-ability
+      describe: should throw an error when trying to register a wrong ability
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            env:
+              <<: *local-service-auth-env
+              fixture: wrong-ability
+          docker:
+            <<: *docker-service-auth
+            env:
+              <<: *docker-service-auth-env
+              fixture: wrong-ability
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/wrong-ability.specs.js
+      coverage: *disable-coverage
+    - name: ability-data-types
+      describe: should work as expected and validate data for each type of ability data
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            env:
+              <<: *local-service-auth-env
+              fixture: multiple-abilities
+          docker:
+            <<: *docker-service-auth
+            env:
+              <<: *docker-service-auth-env
+              fixture: multiple-abilities
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/ability-boolean.specs.js
+          - test/functional/specs/ability-string.specs.js
+          - test/functional/specs/ability-string-enum.specs.js
+          - test/functional/specs/ability-number.specs.js
+          - test/functional/specs/ability-number-enum.specs.js
+      coverage: *disable-coverage
+    - name: documentation-example
+      describe: documentation example should work as expected
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            command: test/functional/commands/start-service-no-name.sh
+            env: &documentation-example-local-env
+              <<: *local-service-auth-env
+              fixture: example
+              service_extra_options: --authDisabled --initialStatus=true
+          docker:
+            <<: *docker-service-auth
+            command: test/functional/commands/start-service-no-name.sh
+            env: &documentation-example-docker-env
+              <<: *docker-service-auth-env
+              fixture: example
+              service_extra_options: --authDisabled --initialStatus=true
+      test: &documentation-example-test
+        <<: *functional-test
+        local:
+          <<: *functional-test-local
+          env:
+            <<: *local-service-env
+            service_name: relay-domapic-module
+        docker:
+          <<: *functional-test-docker
+          env:
+            <<: *docker-service-env
+            service_name: relay-domapic-module
+        specs:
+          - test/functional/specs/example-api.specs.js
+          - test/functional/specs/about-api.specs.js
+          - test/functional/specs/config-api.specs.js
+      coverage: *disable-coverage
+    - name: documentation-example-cli
+      describe: documentation example should work as expected when started using cli
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            command: test/functional/commands/start-cli.sh
+            env: *documentation-example-local-env
+          docker:
+            <<: *docker-service-auth
+            command: test/functional/commands/start-cli.sh
+            env: *documentation-example-docker-env
+      test: *documentation-example-test
+  end-to-end:
+    - name: service-connection
+      describe: Service should connect to controller when started first time if connection options are provided
+      before: *e2e-clean
+      services:
+        - *e2e-mongodb-service
+        - *e2e-controller-service
+        - *e2e-service-service
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/specs/console-registered.specs.js
+          - test/end-to-end/specs/controller-action-handler.specs.js
+          - test/end-to-end/specs/controller-state-handler.specs.js
+      coverage: *disable-coverage
+    - name: service-reconnection
+      describe: Service should connect again to controller when restarted
+      services:
+        - *e2e-mongodb-service
+        - *e2e-controller-service
+        - *e2e-service-service
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/specs/console-registered.specs.js
+          - test/end-to-end/specs/controller-action-handler.specs.js
+          - test/end-to-end/specs/controller-state-handler.specs.js
+      coverage: *disable-coverage
+    - name: service-reconnection-no-config
+      describe: Service should connect again to controller when restarted, even when no config is provided
+      services:
+        - *e2e-mongodb-service
+        - *e2e-controller-service
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            command: test/end-to-end/commands/start-service-no-config.sh
+          local:
+            <<: *e2e-service-service-local
+            command: test/end-to-end/commands/start-service-no-config.sh
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/specs/console-registered.specs.js
+          - test/end-to-end/specs/controller-action-handler.specs.js
+          - test/end-to-end/specs/controller-state-handler.specs.js
+      coverage: *disable-coverage
+    - name: service-changed-reconnection
+      describe: Service should update abilities if changed when connected again to controller
+      services:
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: console-changed
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: console-changed
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            env:
+              <<: *e2e-service-service-docker-env
+              service_port: 3050
+              fixture: console-changed
+          local:
+            <<: *e2e-service-service-local
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: console-changed
+              service_port: 3050
+      test:
+        local:
+          <<: *e2e-test-local
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:localhost:3050
+          env:
+            <<: *e2e-test-local-env
+            service_port: 3050
+            fixture: console-changed
+        docker:
+          <<: *e2e-test-docker
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:service-container:3050
+          env:
+            <<: *e2e-test-docker-env
+            service_port: 3050
+            fixture: console-changed
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/specs/console-changed.specs.js
+          - test/end-to-end/specs/controller-action-handler.specs.js
+          - test/end-to-end/specs/controller-state-handler.specs.js
+      coverage: *disable-coverage
+    - name: service-ability-changed-reconnection
+      describe: Service should delete and create ability again if changed name or another sensible data
+      services:
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: console-ability-changed
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: console-ability-changed
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            env:
+              <<: *e2e-service-service-docker-env
+              service_port: 3050
+              fixture: console-ability-changed
+          local:
+            <<: *e2e-service-service-local
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: console-ability-changed
+              service_port: 3050
+      test:
+        local:
+          <<: *e2e-test-local
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:localhost:3050
+          env:
+            <<: *e2e-test-local-env
+            service_port: 3050
+            fixture: console-ability-changed
+        docker:
+          <<: *e2e-test-docker
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:service-container:3050
+          env:
+            <<: *e2e-test-docker-env
+            service_port: 3050
+            fixture: console-ability-changed
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/specs/console-ability-changed.specs.js
+          - test/end-to-end/specs/controller-action-changed-handler.specs.js
+          - test/end-to-end/specs/controller-state-changed-handler.specs.js
+      coverage: *disable-coverage
+    - name: service-name-repeated
+      describe: Service should not connect to controller if service name is already defined
+      before:
+        local:
+          command: test/end-to-end/commands/clean-service-storage.sh
+          env:
+            service_name: console
+            domapic_path: .test
+      services:
+        - *e2e-mongodb-service
+        - *e2e-controller-service
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            env:
+              <<: *e2e-service-service-docker-env
+              domapic_path: .shared/.domapic
+          local: *e2e-service-service-local
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/service-repeated.specs.js
+          - test/end-to-end/specs/not-connected.specs.js
+      coverage: *disable-coverage
+    - name: connection-api
+      describe: Service should connect to controller when using connection api
+      before: *e2e-clean
+      services:
+        - *e2e-mongodb-service
+        - *e2e-controller-service
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            command: test/end-to-end/commands/start-service-no-controller-config.sh
+          local:
+            <<: *e2e-service-service-local
+            command: test/end-to-end/commands/start-service-no-controller-config.sh
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/not-connected.specs.js
+          - test/end-to-end/specs/console-not-registered.specs.js
+          - test/end-to-end/specs/connection-api.specs.js
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/specs/console-registered.specs.js
+          - test/end-to-end/specs/controller-action-handler.specs.js
+          - test/end-to-end/specs/controller-state-handler.specs.js
+      coverage: *disable-coverage
+    - name: connection-api-wrong-controller-api-key
+      describe: Service should not connect to controller when using connection api with wrong controller apiKey
+      before: *e2e-clean
+      services:
+        - *e2e-mongodb-service
+        - *e2e-controller-service
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            command: test/end-to-end/commands/start-service-no-controller-config.sh
+          local:
+            <<: *e2e-service-service-local
+            command: test/end-to-end/commands/start-service-no-controller-config.sh
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/connection-api-wrong-key.specs.js
+          - test/end-to-end/specs/not-connected.specs.js
+          - test/end-to-end/specs/console-not-registered.specs.js
+      coverage: *disable-coverage

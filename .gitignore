@@ -2,8 +2,10 @@
 .scannerwork
 node_modules
 npm-debug.log
-package-lock.json
 /.test
 /.narval
+.shared
 /.coverage
+/test/end-to-end/fixtures/**/package-lock.json
+/test/end-to-end/fixtures/**/.test
 

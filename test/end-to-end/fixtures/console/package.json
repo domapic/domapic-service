@@ -1,0 +1,14 @@
+{
+  "name": "handle-console-domapic",
+  "version": "1.0.0",
+  "description": "Example of Node.js Domapic module that handles console",
+  "dependencies": {
+    "domapic-service": "file:../../../../"
+  },
+  "scripts": {
+    "domapic-controller": "node_modules/.bin/domapic-controller"
+  },
+  "devDependencies": {
+    "domapic-controller": "1.0.0-alpha.7"
+  }
+}
