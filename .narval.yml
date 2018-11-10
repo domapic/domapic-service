@@ -302,18 +302,18 @@ suites:
           local:
             <<: *local-service-auth
             command: test/functional/commands/start-service-no-name.sh
-            env:
+            env: &documentation-example-local-env
               <<: *local-service-auth-env
               fixture: example
               service_extra_options: --authDisabled --initialStatus=true
           docker:
             <<: *docker-service-auth
             command: test/functional/commands/start-service-no-name.sh
-            env:
+            env: &documentation-example-docker-env
               <<: *docker-service-auth-env
               fixture: example
               service_extra_options: --authDisabled --initialStatus=true
-      test:
+      test: &documentation-example-test
         <<: *functional-test
         local:
           <<: *functional-test-local
@@ -330,6 +330,21 @@ suites:
           - test/functional/specs/about-api.specs.js
           - test/functional/specs/config-api.specs.js
       coverage: *disable-coverage
+    - name: documentation-example-cli
+      describe: documentation example should work as expected when started using cli
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            command: test/functional/commands/start-cli.sh
+            env: *documentation-example-local-env
+          docker:
+            <<: *docker-service-auth
+            command: test/functional/commands/start-cli.sh
+            env: *documentation-example-docker-env
+      test: *documentation-example-test
   end-to-end:
     - name: service-connection
       describe: Service should connect to controller when started first time if connection options are provided

@@ -200,6 +200,8 @@ npm start
 If you want to implement the built-in Domapic CLI into your module, that provides process and logs management, you'll need to add a "cli.js" file to your module:
 
 ```js
+#!/usr/bin/env node
+
 const path = require('path')
 const domapic = require('domapic-service')
  
@@ -213,10 +215,10 @@ Add `bin` and `scripts` properties to your package.json, that will make availabl
 
 ```json
 "bin": {
-  "relay": "./cli"
+  "relay": "./cli.js"
 },
 "scripts": {
-  "relay": "./cli"
+  "relay": "./cli.js"
 }
 ```
 
