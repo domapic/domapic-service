@@ -47,10 +47,10 @@ schemas:
           <<: *docker-service-env
           service_extra_options: --authDisabled
     test: &functional-test
-      local:
+      local: &functional-test-local
         wait-on: tcp:localhost:3100
         env: *local-service-env
-      docker:
+      docker: &functional-test-docker
         container: test-container
         wait-on: tcp:service-container:3000
         env: *docker-service-env
@@ -301,18 +301,32 @@ suites:
           abort-on-error: true
           local:
             <<: *local-service-auth
+            command: test/functional/commands/start-service-no-name.sh
             env:
               <<: *local-service-auth-env
               fixture: example
           docker:
             <<: *docker-service-auth
+            command: test/functional/commands/start-service-no-name.sh
             env:
               <<: *docker-service-auth-env
               fixture: example
       test:
         <<: *functional-test
+        local:
+          <<: *functional-test-local
+          env:
+            <<: *local-service-env
+            service_name: relay-domapic-module
+        docker:
+          <<: *functional-test-docker
+          env:
+            <<: *docker-service-env
+            service_name: relay-domapic-module
         specs:
           - test/functional/specs/example-api.specs.js
+          - test/functional/specs/about-api.specs.js
+          - test/functional/specs/config-api.specs.js
       coverage: *disable-coverage
   end-to-end:
     - name: service-connection
