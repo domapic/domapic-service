@@ -22,7 +22,7 @@ test.describe('when starting module from documentation example', function () {
       return Promise.all([
         test.expect(response.statusCode).to.equal(200),
         test.expect(response.body).to.deep.equal({
-          data: false
+          data: true
         })
       ])
     })

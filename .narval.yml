@@ -305,12 +305,14 @@ suites:
             env:
               <<: *local-service-auth-env
               fixture: example
+              service_extra_options: --authDisabled --initialStatus=true
           docker:
             <<: *docker-service-auth
             command: test/functional/commands/start-service-no-name.sh
             env:
               <<: *docker-service-auth-env
               fixture: example
+              service_extra_options: --authDisabled --initialStatus=true
       test:
         <<: *functional-test
         local:
