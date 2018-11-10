@@ -44,7 +44,7 @@ const request = function (uri, options = {}) {
 }
 
 const readStorage = function (file = 'storage') {
-  return readFile(path.resolve(__dirname, '..', '..', '..', DOMAPIC_PATH, '.domapic', 'foo-service', file, 'service.json'))
+  return readFile(path.resolve(__dirname, '..', '..', '..', DOMAPIC_PATH, '.domapic', process.env.service_name || 'foo-service', file, 'service.json'))
     .then((data) => {
       return Promise.resolve(JSON.parse(data))
     })
@@ -79,5 +79,8 @@ module.exports = {
   waitOnestimatedStartTime,
   request,
   readStorage,
-  Connection
+  Connection,
+  DOMAPIC_PATH,
+  SERVICE_HOST,
+  SERVICE_PORT
 }

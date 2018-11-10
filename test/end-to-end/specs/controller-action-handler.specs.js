@@ -11,7 +11,7 @@ const randomChar = () => {
   return chars.substring(pos, pos + 1)
 }
 
-test.describe('when using controller action api to dispatch service action', function () {
+test.describe('when using controller action api to dispatch module action', function () {
   let consoleAbilityId
   this.timeout(10000)
   const controllerConnection = new utils.ControllerConnection()

@@ -24,6 +24,7 @@
 	* [Process and logs management](#process-and-logs-management)
 * [Connecting with Domapic Controller](#connecting-with-domapic-controller)
 * [Options](#options)
+	* [Custom options](#custom-options)
 * [Security](#security)
 * [Logs](#logs)
 
@@ -104,8 +105,14 @@ domapic.createModule({ packagePath: path.resolve(__dirname) })
 
 * `options` `<object>` containing:
 	* `packagePath` `<string>` Path to the folder where the module's `package.json` is.
-	* `customConfig` `<object>` Domapic provides some common [configuration options](#options). Custom options for a module can be added defining them in this property. In this way, for example, you can add a "gpio" option, that will be received when the module instance is started, and can be modified through arguments in the start command: `npm start -- --gpio=12`. For further info about defining custom configuration options, please refer to the ["custom config" chapter in the domapic-base package documentation][domapic-base-url].
-* Returns a module instance, containing methods described below.
+	* `customConfig` `<object>` Domapic provides some common [configuration options](#options). Custom options for a module can be added defining them in this property. In this way, for example, you can add a "gpio" option, that will be received when the module instance is started, and can be modified through arguments in the start command: `npm start -- --gpio=12`. For further info about defining custom configuration options, please refer to the ["custom options" chapter](#custom-options)
+* Returns a module instance, containing:
+	* `tracer` `<object>` containing methods for tracing with different log levels (`log`, `trace`, `debug`, `info`, `warn`, `error`). Read the ["traces" chapter in the domapic-base documentation][domapic-base-url] for further info.
+	* `config` `<object>` containing methods for getting and setting configuration.
+		* `get([key])` - Returns a promise resolved with the module configuration. Resolved with specific property value if argument `key` is provided.
+		* `set(key [, value])` - Sets `value` for provided `key` into module configuration. Returns a promise.
+	* `register(abilitiesData)` - Register provided abilities into the module. Read the [abilities](#abilities) chapter for further info.
+	* `start` - Starts the server. 
 
 ## Abilities
 
@@ -192,11 +199,14 @@ npm start
 
 If you want to implement the built-in Domapic CLI into your module, that provides process and logs management, you'll need to add a "cli.js" file to your module:
 
-```
+```js
+#!/usr/bin/env node
+
 const path = require('path')
 const domapic = require('domapic-service')
  
 domapic.cli({
+  packagePath: path.resolve(__dirname),
   script: path.resolve(__dirname, 'server.js')
 })
 ```
@@ -205,10 +215,10 @@ Add `bin` and `scripts` properties to your package.json, that will make availabl
 
 ```json
 "bin": {
-  "relay": "./cli"
+  "relay": "./cli.js"
 },
 "scripts": {
-  "relay": "./cli"
+  "relay": "./cli.js"
 }
 ```
 
@@ -282,6 +292,72 @@ npm start -- --help
 npm start -- --name=room-light-switch --logLevel=debug --port=3100 --authDisabled --save
 ```
 
+#### Custom options
+
+You can add your own custom configuration options. They will be seteable from command line execution, displayed in help and validated as the rest of options. Use `customConfig` option in the `createModule` method and in the `cli` method to define them.
+
+[_Yargs_][yargs-url] is used as underlayer to manage options, so you can read its documentation for more details about how to define them.
+
+> Following with the example, add an `options.js` file to the module:
+
+```js
+module.exports = {
+  initialStatus: {
+    type: 'boolean',
+    alias: ['status'],
+    describe: 'Set initial status of the relay when module is started',
+    default: false
+  }
+}
+```
+
+> Use it in the `server.js` file:
+
+```js
+const path = require('path')
+const domapic = require('domapic-service')
+
+const options = require('./options')
+
+domapic.createModule({
+  packagePath: path.resolve(__dirname),
+  customConfig: options
+}).then(async module => {
+  let status = await module.config.get('initialStatus')
+  //...
+})
+```
+
+> Now, the custom `initialStatus` option can be used from command line when starting the module:
+
+```bash
+npm start -- --initialStatus=true
+# The module will be started, and "initialStatus" value in config will be true
+```
+
+> Custom options defined for a service should be defined in CLI implementation too. Add them to the `cli.js` file:
+
+```js
+const path = require('path')
+const domapic = require('domapic-service')
+
+const options = require('./options')
+ 
+domapic.cli({
+  packagePath: path.resolve(__dirname),
+  script: path.resolve(__dirname, 'server.js'),
+  customConfig: options
+})
+```
+
+> Now, the custom `initialStatus` option can be used from CLI too:
+
+```bash
+relay start --initialStatus=true
+# The module will be started, and "initialStatus" value in config will be true
+```
+
+
 ## Security
 
 The Domapic Modules are intended to be used only in your local network by the Domapic Controller, without exposing them to the Internet, but, despiting this fact, all HTTP communications are secured as well using OAUTH Api Keys in order to make the system more robust, and to provide a role based securization. Only requests coming from localhost are not secured by default, to make easier the configuration process, but this behavior can be modified too.
@@ -311,7 +387,7 @@ Server logs are saved too into a daily file. These files are rotated automatical
 
 [domapic-logo-image]: http://domapic.com/assets/domapic-logo.png
 [domapic-example-image]: http://domapic.com/assets/domapic-schema-example_01.png
-[swagger-example-image]: swagger-example.jpg
+[swagger-example-image]: http://domapic.com/assets/swagger-example.jpg
 
 [coveralls-image]: https://coveralls.io/repos/github/domapic/domapic-service/badge.svg?branch=master
 [coveralls-url]: https://coveralls.io/github/domapic/domapic-service
@@ -335,6 +411,7 @@ Server logs are saved too into a daily file. These files are rotated automatical
 [website-image]: https://img.shields.io/website-up-down-green-red/http/domapic.com.svg?label=domapic.com
 [website-url]: http://domapic.com/
 
+[yargs-url]: https://www.npmjs.com/package/yargs
 [homekit-url]: https://www.apple.com/ios/home
 [hue-url]: https://www.developers.meethue.com
 [alexa-url]: https://developer.amazon.com/alexa

@@ -1,6 +1,12 @@
+#!/usr/bin/env node
+
 const path = require('path')
 const domapic = require('../../../../index')
 
+const options = require('./options')
+
 domapic.cli({
-  script: path.resolve(__dirname, 'server.js')
+  packagePath: path.resolve(__dirname),
+  script: path.resolve(__dirname, 'server.js'),
+  customConfig: options
 })

@@ -6,6 +6,6 @@
     "domapic-service": "file:../../../../"
   },
   "scripts": {
-    "relay": "./cli"
+    "relay": "./cli.js"
   }
 }
