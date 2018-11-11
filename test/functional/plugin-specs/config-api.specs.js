@@ -1,7 +1,7 @@
 const path = require('path')
 const test = require('narval')
 
-const utils = require('./utils')
+const utils = require('../specs/utils')
 
 test.describe('config api', function () {
   this.timeout(10000)
@@ -15,7 +15,7 @@ test.describe('config api', function () {
       })
   })
 
-  test.it('should return module configuration', () => {
+  test.it('should return plugin configuration', () => {
     return connection.request('/config', {
       method: 'GET'
     }).then((response) => {
@@ -25,7 +25,7 @@ test.describe('config api', function () {
           color: true,
           logLevel: 'info',
           port: parseInt(utils.SERVICE_PORT, 10),
-          initialStatus: true,
+          exampleOption: false,
           authDisabled: [],
           hostName: utils.SERVICE_HOST,
           path: path.resolve(__dirname, '..', '..', '..', utils.DOMAPIC_PATH)

@@ -345,6 +345,86 @@ suites:
             command: test/functional/commands/start-cli.sh
             env: *documentation-example-docker-env
       test: *documentation-example-test
+      coverage: *disable-coverage
+  functional-plugin:
+    - name: plugin-no-controller-provided
+      describe: should print an api key valid to launch a pairing command from controller
+      before: *clean
+      services: &plugin-service
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            env:
+              <<: *local-service-auth-env
+              fixture: plugin-example
+          docker:
+            <<: *docker-service-auth
+            env:
+              <<: *docker-service-auth-env
+              fixture: plugin-example
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/no-controller-api-key.specs.js
+          - test/functional/specs/not-connected.specs.js
+      coverage: *disable-coverage
+    - name: plugin-auth-api
+      describe: should add or remove api keys
+      before: *clean
+      services: *plugin-service
+      test:
+        <<: *functional-test
+        specs: test/functional/specs/auth-api.specs.js
+      coverage: *disable-coverage
+    - name: plugin-connection-api-unavailable
+      describe: should try to connect to controller when calling to connection api, and return server unavailable if controller is unavailable
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service
+            env:
+              <<: *local-service-env
+              fixture: plugin-example
+          docker:
+            <<: *docker-service
+            env:
+              <<: *local-service-env
+              fixture: plugin-example
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/no-controller-api-key.specs.js
+          - test/functional/specs/not-connected.specs.js
+          - test/functional/specs/connection-api-unavailable.specs.js
+          - test/functional/specs/not-connected.specs.js
+      coverage: *disable-coverage
+    - name: plugin-example-cli
+      describe: plugin example should work as expected when started using cli
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            command: test/functional/commands/start-plugin-cli.sh
+            env:
+              <<: *local-service-auth-env
+              fixture: plugin-example
+          docker:
+            <<: *docker-service-auth
+            command: test/functional/commands/start-plugin-cli.sh
+            env:
+              <<: *docker-service-auth-env
+              fixture: plugin-example
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/plugin-specs/about-api.specs.js
+          - test/functional/plugin-specs/config-api.specs.js
+      coverage: *disable-coverage
   end-to-end:
     - name: service-connection
       describe: Service should connect to controller when started first time if connection options are provided
