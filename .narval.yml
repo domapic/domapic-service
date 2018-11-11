@@ -653,3 +653,87 @@ suites:
           - test/end-to-end/specs/not-connected.specs.js
           - test/end-to-end/specs/console-not-registered.specs.js
       coverage: *disable-coverage
+  end-to-end-plugin:
+    - name: plugin-connection
+      describe: Plugin should connect to controller when started first time if connection options are provided
+      before: *e2e-clean
+      services: &plugin-e2e-services
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: plugin
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: plugin
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            env:
+              <<: *e2e-service-service-docker-env
+              fixture: plugin
+              service_name: example-plugin
+          local:
+            <<: *e2e-service-service-local
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: plugin
+              service_name: example-plugin
+      test: &plugin-e2e-test
+        local:
+          <<: *e2e-test-local
+          env:
+            <<: *e2e-test-local-env
+            fixture: plugin
+            service_name: example-plugin
+        docker:
+          <<: *e2e-test-docker
+          env:
+            <<: *e2e-test-docker-env
+            fixture: plugin
+            service_name: example-plugin
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/plugin-specs/plugin-registered.specs.js
+      coverage: *disable-coverage
+    - name: plugin-reconnection
+      describe: Plugin should connect again to controller when restarted
+      services: *plugin-e2e-services
+      test: *plugin-e2e-test
+      coverage: *disable-coverage
+    - name: plugin-reconnection-no-config
+      describe: Plugin should connect again to controller when restarted, even when no config is provided
+      services:
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: plugin
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: plugin
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            command: test/end-to-end/commands/start-service-no-config.sh
+            env:
+              <<: *e2e-service-service-docker-env
+              fixture: plugin
+              service_name: example-plugin
+          local:
+            <<: *e2e-service-service-local
+            command: test/end-to-end/commands/start-service-no-config.sh
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: plugin
+              service_name: example-plugin
+      test: *plugin-e2e-test
+      coverage: *disable-coverage
