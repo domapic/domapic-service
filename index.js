@@ -4,19 +4,26 @@ const Promise = require('bluebird')
 const domapic = require('domapic-base')
 
 const options = require('./lib/options')
-const ServiceHandler = require('./lib/ServiceHandler')
+const serviceHandlers = require('./lib/serviceHandlers')
+const { SERVICE_TYPES } = require('./lib/utils')
 
-const createModule = moduleOptions => domapic.Service(options.extendWith(moduleOptions))
-  .then(service => {
-    const serviceHandler = new ServiceHandler(service)
-    return Promise.all([
-      serviceHandler.addConnectionApi(),
-      serviceHandler.addSecurityApi(),
-      serviceHandler.addSecurity()
-    ]).then(() => Promise.resolve(serviceHandler.publicMethods))
-  })
+const ServiceCreator = function (Builder, type) {
+  return serviceOptions => domapic.Service(options.extendWith(serviceOptions, type))
+    .then(service => {
+      const serviceHandler = new Builder(service)
+      return Promise.all([
+        serviceHandler.addConnectionApi(),
+        serviceHandler.addSecurityApi(),
+        serviceHandler.addSecurity()
+      ]).then(() => Promise.resolve(serviceHandler.publicMethods))
+    })
+}
+
+const createModule = new ServiceCreator(serviceHandlers.Module, SERVICE_TYPES.MODULE)
+const createPlugin = new ServiceCreator(serviceHandlers.Plugin, SERVICE_TYPES.PLUGIN)
 
 module.exports = {
   createModule,
+  createPlugin,
   cli: domapic.cli
 }
