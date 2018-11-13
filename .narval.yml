@@ -737,3 +737,95 @@ suites:
               service_name: example-plugin
       test: *plugin-e2e-test
       coverage: *disable-coverage
+    - name: plugin-name-repeated
+      describe: Plugin should not connect to controller if service name is already defined
+      before:
+        local:
+          command: test/end-to-end/commands/clean-service-storage.sh
+          env:
+            service_name: example-plugin
+            domapic_path: .test
+      services:
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: plugin
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: plugin
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            env:
+              <<: *e2e-service-service-docker-env
+              fixture: plugin
+              service_name: example-plugin
+              domapic_path: .shared/.domapic
+          local:
+            <<: *e2e-service-service-local
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: plugin
+              service_name: example-plugin
+      test:
+        <<: *plugin-e2e-test
+        specs:
+          - test/end-to-end/specs/service-repeated.specs.js
+          - test/end-to-end/specs/not-connected.specs.js
+      coverage: *disable-coverage
+    - name: plugin-connection-api
+      describe: Plugin should connect to controller when using connection api
+      before: *e2e-clean
+      services: &plugin-e2e-services-no-controller-config
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: plugin
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: plugin
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            command: test/end-to-end/commands/start-service-no-controller-config.sh
+            env:
+              <<: *e2e-service-service-docker-env
+              fixture: plugin
+              service_name: example-plugin
+          local:
+            <<: *e2e-service-service-local
+            command: test/end-to-end/commands/start-service-no-controller-config.sh
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: plugin
+              service_name: example-plugin
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/not-connected.specs.js
+          - test/end-to-end/plugin-specs/plugin-not-registered.specs.js
+          - test/end-to-end/specs/connection-api.specs.js
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/plugin-specs/plugin-registered.specs.js
+      coverage: *disable-coverage
+    - name: plugin-connection-api-wrong-controller-api-key
+      describe: Plugin should not connect to controller when using connection api with wrong controller apiKey
+      before: *e2e-clean
+      services: *plugin-e2e-services-no-controller-config
+      test:
+        <<: *plugin-e2e-test
+        specs:
+          - test/end-to-end/specs/connection-api-wrong-key.specs.js
+          - test/end-to-end/specs/not-connected.specs.js
+          - test/end-to-end/plugin-specs/plugin-not-registered.specs.js
+      coverage: *disable-coverage
