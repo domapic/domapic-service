@@ -4,7 +4,7 @@ const testUtils = require('narval/utils')
 
 const utils = require('./utils')
 
-test.describe('when module name is already defined in controller', function () {
+test.describe('when service name is already defined in controller', function () {
   this.timeout(10000)
 
   test.it('should log a connection error', () => {

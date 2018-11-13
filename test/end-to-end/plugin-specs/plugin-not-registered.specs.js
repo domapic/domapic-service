@@ -4,7 +4,6 @@ const test = require('narval')
 const utils = require('../specs/utils')
 
 test.describe('when connection with controller is successful', function () {
-  let serviceUserId
   this.timeout(10000)
 
   const controllerConnection = new utils.ControllerConnection()
