@@ -391,7 +391,7 @@ suites:
           docker:
             <<: *docker-service
             env:
-              <<: *local-service-env
+              <<: *docker-service-env
               fixture: plugin-example
       test:
         <<: *functional-test
