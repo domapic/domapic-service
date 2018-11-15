@@ -87,7 +87,7 @@ domapic.createModule({ packagePath: path.resolve(__dirname) })
           description: 'Switch on/off the relay',
           handler: newStatus => {
             status = newStatus
-            module.emit('switch', status)
+            module.events.emit('switch', status)
             return Promise.resolve(status)
           }
         }
@@ -112,7 +112,8 @@ domapic.createModule({ packagePath: path.resolve(__dirname) })
 		* `get([key])` - Returns a promise resolved with the module configuration. Resolved with specific property value if argument `key` is provided.
 		* `set(key [, value])` - Sets `value` for provided `key` into module configuration. Returns a promise.
 	* `register(abilitiesData)` - Register provided abilities into the module. Read the [abilities](#abilities) chapter for further info.
-	* `start` - Starts the server. 
+	* `start` - Starts the server.
+  * `events`- [Node.js emitter object][nodejs-events-url]. Used to emit abilities events to the controller.
 
 ## Abilities
 
@@ -174,10 +175,10 @@ In this example, the action's `handler` method returned `Promise.resolve(true)`.
 
 #### Event
 
-When [ability](#abilities) has an `event` property defined, the `emit` method of the module can be used to trigger the ability event, passing the correspondant data. This will produce module calling to controller api to inform about the trigered event.
+When [ability](#abilities) has an `event` property defined, the `emit` method of the module's `events` object can be used to emit the ability event, passing the correspondant data. This will produce module calling to controller api to inform about the trigered event.
 
 ```js
-module.emit('switch', true)
+module.events.emit('switch', true)
 ```
 In this example, the module will call to the correspondant controller api resource, passing `true` as data.
 
@@ -419,3 +420,4 @@ Server logs are saved too into a daily file. These files are rotated automatical
 [domapic-base-url]: https://npmjs.com/domapic-base
 [pm2-log-rotate-url]: https://github.com/keymetrics/pm2-logrotate
 [pm2-url]: http://pm2.keymetrics.io/
+[nodejs-events-url]: https://nodejs.org/api/events.html
