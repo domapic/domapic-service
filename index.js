@@ -11,11 +11,8 @@ const ServiceCreator = function (Builder, type) {
   return serviceOptions => domapic.Service(options.extendWith(serviceOptions, type))
     .then(service => {
       const serviceHandler = new Builder(service)
-      return Promise.all([
-        serviceHandler.addConnectionApi(),
-        serviceHandler.addSecurityApi(),
-        serviceHandler.addSecurity()
-      ]).then(() => Promise.resolve(serviceHandler.publicMethods))
+      return serviceHandler.init()
+        .then(() => Promise.resolve(serviceHandler.publicMethods))
     })
 }
 

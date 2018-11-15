@@ -421,3 +421,23 @@ Server logs are saved too into a daily file. These files are rotated automatical
 [pm2-log-rotate-url]: https://github.com/keymetrics/pm2-logrotate
 [pm2-url]: http://pm2.keymetrics.io/
 [nodejs-events-url]: https://nodejs.org/api/events.html
+
+<!--
+TODO, add events documentation
+
+ability:updated
+ability:created
+ability:deleted
+
+ability:action
+ability:event
+
+service:created
+service:updated
+service:deleted
+
+user:created
+user:updated
+user:deleted
+
+-->

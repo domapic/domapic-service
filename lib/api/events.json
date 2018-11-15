@@ -1,0 +1,72 @@
+{
+  "tags": [{
+    "name": "events",
+    "description": "Events from Domapic Controller"
+  }],
+  "components": {
+    "schemas": {
+      "Event": {
+        "description": "Domapic Controller Event",
+        "type": "object",
+        "properties": {
+          "entity": {
+            "description": "Controller entity to which event is related",
+            "type": "string",
+            "enum": ["ability", "service", "user"]
+          },
+          "operation": {
+            "description": "Operation applied to entity",
+            "enum": ["created", "updated", "deleted", "action", "event"]
+          },
+          "data": {
+            "description": "Data containing details about entity operation",
+            "type": "object"
+          }
+        },
+        "required": ["entity", "operation", "data"],
+        "additionalProperties": false,
+        "example": {
+          "entity": "user",
+          "operation": "created",
+          "data": {
+            "_id": "1223123",
+            "name": "Foo user",
+            "email": "foo-email@foo-domain.com",
+            "role": "admin",
+            "createdAt": "2018-07-28T17:13:08.718Z",
+            "updatedAt": "2018-07-28T17:13:09.730Z"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/events": {
+      "post": {
+        "tags": ["events"],
+        "summary": "Receives Controller events",
+        "description": "Receives all events emitted by Controller",
+        "operationId": "events",
+        "requestBody": {
+          "description": "Event data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Event"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Event success"
+          }
+        },
+        "security": [{
+          "apiKey": []
+        }]
+      }
+    }
+  }
+}
