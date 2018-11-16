@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [unreleased]
 ### Added
 - Add plugin Constructor
+- Add events api for plugins
 ### Changed
 ### Fixed
 ### Removed
