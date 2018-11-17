@@ -38,7 +38,7 @@ test.describe('events api', function () {
 
   _.each(eventsToTest, (eventData, entity) => {
     _.each(eventData, (trace, operation) => {
-      test.it(`should emit a "${entity}:${operation}" event when entity is "${entity}" and operation is "${operation}"`, () => {
+      test.it(`should emit "${entity}:${operation}", "*:${operation}" and "${entity}:*" events when entity is "${entity}" and operation is "${operation}"`, () => {
         const fooData = `Data: ${entity}:${operation}`
         const globalEvent = `Received * event. Entity ${entity}, operation ${operation}, data: ${fooData}`
         const entityEvent = `Received ${entity}:* event. Operation ${operation}, data: ${fooData}`
