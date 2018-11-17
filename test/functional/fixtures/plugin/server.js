@@ -55,5 +55,8 @@ domapic.createPlugin({
     plugin.tracer.info(`Received * event. Entity ${data.entity}, operation ${data.operation}, data: ${data.data.fooData}`)
   })
 
+  plugin.controller.users.me()
+    .catch(err => plugin.tracer.error(err.message))
+
   return plugin.start()
 })

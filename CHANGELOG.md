@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Add plugin Constructor
 - Add events api for plugins
+- Add controller api interface for plugins
 ### Changed
 ### Fixed
 ### Removed
