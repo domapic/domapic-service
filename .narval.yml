@@ -380,6 +380,7 @@ suites:
           - test/functional/plugin-specs/about-api.specs.js
           - test/functional/plugin-specs/config-api.specs.js
           - test/functional/plugin-specs/events-api.specs.js
+          - test/functional/plugin-specs/controller-interface.specs.js
       coverage: *disable-coverage
     - name: plugin-connection-api-unavailable
       describe: should try to connect to controller when calling to connection api, and return server unavailable if controller is unavailable
