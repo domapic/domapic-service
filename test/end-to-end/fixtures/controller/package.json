@@ -1,0 +1,11 @@
+{
+  "name": "example-domapic-controller",
+  "version": "1.0.0",
+  "description": "Domapic controller for testing purposes",
+  "scripts": {
+    "domapic-controller": "node_modules/.bin/domapic-controller"
+  },
+  "dependencies": {
+    "domapic-controller": "1.0.0-alpha.8"
+  }
+}
