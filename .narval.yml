@@ -834,3 +834,52 @@ suites:
           - test/end-to-end/specs/not-connected.specs.js
           - test/end-to-end/plugin-specs/plugin-not-registered.specs.js
       coverage: *disable-coverage
+    - name: plugin-events
+      describe: Plugin should receive controller events, and controller interface should work as expected.
+      before: *e2e-clean
+      services:
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: plugin-events
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: plugin-events
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            env:
+              <<: *e2e-service-service-docker-env
+              fixture: plugin-events
+              service_name: example-plugin
+          local:
+            <<: *e2e-service-service-local
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: plugin-events
+              service_name: example-plugin
+      test: &plugin-e2e-test
+        local:
+          <<: *e2e-test-local
+          env:
+            <<: *e2e-test-local-env
+            fixture: plugin-events
+            service_name: example-plugin
+            domapic_path: .test
+        docker:
+          <<: *e2e-test-docker
+          env:
+            <<: *e2e-test-docker-env
+            fixture: plugin-events
+            service_name: example-plugin
+            domapic_path: .shared
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/plugin-specs/plugin-registered.specs.js
+          - test/end-to-end/plugin-specs/plugin-events.specs.js
+      coverage: *disable-coverage

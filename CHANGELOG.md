@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Add plugin Constructor
 - Add events api for plugins
 - Add controller api interface for plugins
+- Expose extendOpenApi and addOperations methods to module and plugin
 ### Changed
 ### Fixed
 ### Removed

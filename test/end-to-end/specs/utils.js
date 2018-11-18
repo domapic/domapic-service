@@ -9,7 +9,7 @@ const requestPromise = require('request-promise')
 const SERVICE_HOST = process.env.service_host_name
 const SERVICE_PORT = process.env.service_port
 const DOMAPIC_PATH = process.env.domapic_path
-const SERVICE_NAME = process.env.fixture
+const SERVICE_NAME = process.env.service_name
 const ESTIMATED_START_TIME = 1000
 const CONTROLLER_URL = `http://${process.env.controller_host_name}:3000`
 
@@ -47,7 +47,7 @@ const request = function (uri, options = {}) {
 }
 
 const readStorage = function (file = 'storage') {
-  return readFile(path.resolve(__dirname, '..', '..', '..', DOMAPIC_PATH, '.domapic', SERVICE_NAME, file, 'service.json'))
+  return readFile(path.resolve(__dirname, '..', '..', '..', DOMAPIC_PATH, '.domapic', SERVICE_NAME || 'foo-service', file, 'service.json'))
     .then((data) => {
       return Promise.resolve(JSON.parse(data))
     })
@@ -130,8 +130,8 @@ class ControllerConnection {
 }
 
 class ServiceConnection {
-  constructor () {
-    this._apiKey = null
+  constructor (apiKey) {
+    this._apiKey = apiKey
   }
 
   async getApiKey () {
