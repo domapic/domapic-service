@@ -876,7 +876,7 @@ suites:
                 - tcp:controller-container:3100
             env:
               controller_host_name: controller-container
-              service_host_name: service-console-container
+              service_host_name: module-container
               service_port: 3200
               service_name: console-module
               fixture: console
