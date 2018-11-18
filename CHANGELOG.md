@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 ### Removed
 ### BREAKING CHANGES
-- Changed Controller uris to adapt them to Controller version 1.0.0-alpha.8
+- Changed Controller uris to adapt them to Controller version 1.0.0-alpha.9
 - Expose event emitter in events object, instead of module object directly
 
 ## [1.0.0-alpha.1] - 2018-11-4
