@@ -873,7 +873,7 @@ suites:
             wait-on:
               timeout: 120000
               resources:
-                - tcp:controller-container:3100
+                - tcp:service-container:3000
             env:
               controller_host_name: controller-container
               service_host_name: module-container
