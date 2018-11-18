@@ -155,8 +155,8 @@ class ServiceConnection {
   }
 }
 
-const serviceLogs = () => {
-  return waitOnestimatedStartTime(200)
+const serviceLogs = (time = 200) => {
+  return waitOnestimatedStartTime(time)
     .then(() => testUtils.logs.combined('service'))
 }
 

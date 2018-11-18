@@ -152,6 +152,9 @@ docker-containers:
   - name: service-container
     build: node-image
     bind: *bind
+  - name: module-container
+    build: node-image
+    bind: *bind
   - name: test-container
     build: node-image
     bind: *bind
@@ -863,9 +866,38 @@ suites:
               <<: *e2e-service-service-local-env
               fixture: plugin-events
               service_name: example-plugin
+        - name: module
+          docker:
+            container: module-container
+            command: test/end-to-end/commands/start-service.sh
+            wait-on:
+              timeout: 120000
+              resources:
+                - tcp:controller-container:3100
+            env:
+              controller_host_name: controller-container
+              service_host_name: service-console-container
+              service_port: 3200
+              service_name: console-module
+              fixture: console
+              domapic_path: .shared
+          local:
+            command: test/end-to-end/commands/start-service.sh
+            wait-on: tcp:localhost:3100
+            env:
+              controller_host_name: localhost
+              service_host_name: localhost
+              service_port: 3200
+              service_name: console-module
+              fixture: console
+              domapic_path: .test
       test: &plugin-e2e-test
         local:
           <<: *e2e-test-local
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:localhost:3200
           env:
             <<: *e2e-test-local-env
             fixture: plugin-events
@@ -873,6 +905,10 @@ suites:
             domapic_path: .test
         docker:
           <<: *e2e-test-docker
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:module-container:3200
           env:
             <<: *e2e-test-docker-env
             fixture: plugin-events

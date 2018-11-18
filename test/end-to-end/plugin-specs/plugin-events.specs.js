@@ -4,9 +4,11 @@ const test = require('narval')
 const utils = require('../specs/utils')
 
 test.describe('plugin controller interface and events', function () {
-  this.timeout(10000)
+  this.timeout(20000)
   let serviceConnection
   let userId
+  let consoleServiceId
+  let consoleAbilityId
 
   const requestController = (entity, operation, options = {}) => {
     const body = {
@@ -96,6 +98,110 @@ test.describe('plugin controller interface and events', function () {
           test.expect(response.statusCode).to.equal(200),
           test.expect(response.body.length).to.equal(1),
           test.expect(noOperator).to.be.undefined()
+        ])
+      })
+    })
+  })
+
+  test.describe('controller interface for getting services', () => {
+    test.it('should return all services', () => {
+      return requestController('services', 'get').then(response => {
+        const plugin = response.body.find(user => user.name === 'example-plugin')
+        const console = response.body.find(user => user.name === 'console-module')
+        consoleServiceId = console._id
+        return Promise.all([
+          test.expect(response.statusCode).to.equal(200),
+          test.expect(response.body.length).to.equal(2),
+          test.expect(plugin).to.not.be.undefined(),
+          test.expect(console).to.not.be.undefined()
+        ])
+      })
+    })
+  })
+
+  test.describe('controller interface for getting abilities', () => {
+    test.it('should return all abilities', () => {
+      return requestController('abilities', 'get').then(response => {
+        const console = response.body.find(ability => ability._service === consoleServiceId)
+        consoleAbilityId = console._id
+        return Promise.all([
+          test.expect(response.statusCode).to.equal(200),
+          test.expect(response.body.length).to.equal(1),
+          test.expect(console).to.not.be.undefined()
+        ])
+      })
+    })
+  })
+
+  test.describe('controller interface for getting ability state', () => {
+    test.it('should return ability state', () => {
+      return requestController('abilities', 'state', {
+        id: consoleAbilityId
+      }).then(response => {
+        return Promise.all([
+          test.expect(response.statusCode).to.equal(200),
+          test.expect(response.body.data).to.equal('')
+        ])
+      })
+    })
+  })
+
+  test.describe('when using controller interface for dispatching ability action', () => {
+    test.it('should return ability action response', () => {
+      return requestController('abilities', 'action', {
+        id: consoleAbilityId,
+        data: {
+          data: 'a'
+        }
+      }).then(response => {
+        return Promise.all([
+          test.expect(response.statusCode).to.equal(200)
+        ])
+      })
+    })
+
+    test.it('should have received an event from controller about dispatched action', () => {
+      return utils.serviceLogs(500)
+        .then(logs => {
+          return Promise.all([
+            test.expect(logs).to.contain(`Received ability:action event. Data: {"_id":"${consoleAbilityId}","data":"a"}`)
+          ])
+        })
+    })
+
+    test.it('should have received an event from controller about triggered event', () => {
+      return utils.serviceLogs()
+        .then(logs => {
+          return Promise.all([
+            test.expect(logs).to.contain(`Received ability:event event. Data: {"_id":"${consoleAbilityId}","data":"a"}`)
+          ])
+        })
+    })
+
+    test.it('should have changed ability state', () => {
+      return requestController('abilities', 'state', {
+        id: consoleAbilityId
+      }).then(response => {
+        return Promise.all([
+          test.expect(response.statusCode).to.equal(200),
+          test.expect(response.body.data).to.equal('a')
+        ])
+      })
+    })
+  })
+
+  test.describe('controller interface for getting logs', () => {
+    test.it('should return logs', () => {
+      return requestController('logs', 'get').then(response => {
+        const action = response.body.find(log => log.type === 'action')
+        const event = response.body.find(log => log.type === 'event')
+        return Promise.all([
+          test.expect(response.statusCode).to.equal(200),
+          test.expect(response.body.length).to.equal(2),
+          test.expect(action.data).to.equal('a'),
+          test.expect(event.data).to.equal('a'),
+          test.expect(event._ability).to.equal(consoleAbilityId),
+          test.expect(action._ability).to.equal(consoleAbilityId)
         ])
       })
     })
