@@ -155,6 +155,11 @@ class ServiceConnection {
   }
 }
 
+const serviceLogs = () => {
+  return waitOnestimatedStartTime(200)
+    .then(() => testUtils.logs.combined('service'))
+}
+
 module.exports = {
   waitOnestimatedStartTime,
   request,
@@ -166,5 +171,6 @@ module.exports = {
   getControllerApiKey,
   getServiceApiKey,
   ControllerConnection,
-  ServiceConnection
+  ServiceConnection,
+  serviceLogs
 }
