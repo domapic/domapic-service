@@ -1,6 +1,6 @@
 {
   "name": "domapic-service",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "Base for Domapic Node.js services",
   "main": "index.js",
   "keywords": [
