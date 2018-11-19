@@ -109,15 +109,17 @@ domapic.createModule({ packagePath: path.resolve(__dirname) })
 * `options` `<object>` containing:
 	* `packagePath` `<string>` Path to the folder where the module's `package.json` is.
 	* `customConfig` `<object>` Domapic provides some common [configuration options](#options). Custom options for a module can be added defining them in this property. In this way, for example, you can add a "gpio" option, that will be received when the module instance is started, and can be modified through arguments in the start command: `npm start -- --gpio=12`. For further info about defining custom configuration options, please refer to the ["custom options" chapter](#custom-options)
-* Returns a module instance, containing:
-	* `tracer` `<object>` containing methods for tracing with different log levels (`log`, `trace`, `debug`, `info`, `warn`, `error`). Read the ["traces" chapter in the domapic-base documentation][domapic-base-url] for further info.
-	* `config` `<object>` containing methods for getting and setting configuration.
-		* `get([key])` - Returns a promise resolved with the module configuration. Resolved with specific property value if argument `key` is provided.
-		* `set(key [, value])` - Sets `value` for provided `key` into module configuration. Returns a promise.
-  * `api` - Object containing methods for [extending the built-in api](#extending-api).
-	* `register(abilitiesData)` - Register provided abilities into the module. Read the [abilities](#abilities) chapter for further info.
-	* `start` - Starts the server.
-	* `events`- [Node.js emitter object][nodejs-events-url]. Used to emit abilities events to the controller.
+
+Returns a module instance, containing:
+
+* `tracer` `<object>` containing methods for tracing with different log levels (`log`, `trace`, `debug`, `info`, `warn`, `error`). Read the ["traces" chapter in the domapic-base documentation][domapic-base-url] for further info.
+* `config` `<object>` containing methods for getting and setting configuration.
+	* `get([key])` - Returns a promise resolved with the module configuration. Resolved with specific property value if argument `key` is provided.
+	* `set(key [, value])` - Sets `value` for provided `key` into module configuration. Returns a promise.
+* `api` - Object containing methods for [extending the built-in api](#extending-api).
+* `register(abilitiesData)` - Register provided abilities into the module. Read the [abilities](#abilities) chapter for further info.
+* `start` - Starts the server.
+* `events`- [Node.js emitter object][nodejs-events-url]. Used to emit abilities events to the controller.
 
 ### Abilities
 
@@ -218,9 +220,9 @@ domapic.createPlugin({ packagePath: path.resolve(__dirname) })
       plugin.tracer.info(`Received ${eventData.entity}:${eventData.operation} event. Data: ${JSON.stringify(eventData.data)}`)
     })
 
-    plugin.events.on('connection', () => {
+    plugin.events.on('connection', async () => {
       const abilities = await plugin.controller.abilities.get()
-      abilities.map(ability => {
+      abilities.map(async ability => {
         if (ability.state) {
           const state = await plugin.controller.abilities.state(ability._id)
           console.log(`Ability "${ability.name}" of module "${ability._module}" has state "${state.data}"`)
@@ -239,15 +241,17 @@ domapic.createPlugin({ packagePath: path.resolve(__dirname) })
 * `options` `<object>` containing:
 	* `packagePath` `<string>` Path to the folder where the plugin's `package.json` is.
 	* `customConfig` `<object>` Domapic provides some common [configuration options](#options). Custom options for a plugin can be added defining them in this property. For further info about defining custom configuration options, please refer to the ["custom options" chapter](#custom-options)
-* Returns a plugin instance, containing:
-	* `tracer` `<object>` containing methods for tracing with different log levels (`log`, `trace`, `debug`, `info`, `warn`, `error`). Read the ["traces" chapter in the domapic-base documentation][domapic-base-url] for further info.
-	* `config` `<object>` containing methods for getting and setting configuration.
-		* `get([key])` - Returns a promise resolved with the plugin configuration. Resolved with specific property value if argument `key` is provided.
-		* `set(key [, value])` - Sets `value` for provided `key` into module configuration. Returns a promise.
-  * `api` - Object containing methods for [extending the built-in api](#extending-api).
-	* `start` - Starts the server.
-	* `events`- [Node.js emitter object][nodejs-events-url]. Used to subscribe to events from the Controller.
-	* `controller` - Object containing an interface to make requests to Controller. Read the [Controller interface chapter for further info](#controller-interface).
+
+Returns a plugin instance, containing:
+
+* `tracer` `<object>` containing methods for tracing with different log levels (`log`, `trace`, `debug`, `info`, `warn`, `error`). Read the ["traces" chapter in the domapic-base documentation][domapic-base-url] for further info.
+* `config` `<object>` containing methods for getting and setting configuration.
+	* `get([key])` - Returns a promise resolved with the plugin configuration. Resolved with specific property value if argument `key` is provided.
+	* `set(key [, value])` - Sets `value` for provided `key` into module configuration. Returns a promise.
+* `api` - Object containing methods for [extending the built-in api](#extending-api).
+* `start` - Starts the server.
+* `events`- [Node.js emitter object][nodejs-events-url]. Used to subscribe to events from the Controller.
+* `controller` - Object containing an interface to make requests to Controller. Read the [Controller interface chapter for further info](#controller-interface).
 
 ### Controller events listeners
 
