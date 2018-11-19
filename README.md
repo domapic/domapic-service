@@ -2,11 +2,11 @@
 
 # Domapic Service
 
-> Node.js base for Domapic Modules
+> Node.js base for creating [Domapic][website-url] Modules and Plugins.
 
 [![Build status][travisci-image]][travisci-url] <!--[![Coverage Status][coveralls-image]][coveralls-url] [![Quality Gate][quality-gate-image]][quality-gate-url]--> [![js-standard-style][standard-image]][standard-url]
 
-[![NPM dependencies][npm-dependencies-image]][npm-dependencies-url] [![Last commit][last-commit-image]][last-commit-url] [![Last release][release-image]][release-url] 
+[![NPM dependencies][npm-dependencies-image]][npm-dependencies-url] [![Last commit][last-commit-image]][last-commit-url] <!--[![Last release][release-image]][release-url] -->
 
 [![NPM downloads][npm-downloads-image]][npm-downloads-url] [![Website][website-image]][website-url] [![License][license-image]][license-url]
 
@@ -14,25 +14,28 @@
 
 ## Table of Contents
 
-* [Introduction](#introduction)
-* [Creating a module](#creating-your-module)
-  * [Abilities](#registering-abilities)
-    * [Action](#action)
-    * [State](#state)
-    * [Event](#event)
+* [Modules](#modules)
+	* [Creating a module](#creating-a-module)
+	* [Abilities](#registering-abilities)
+		* [Action](#action)
+		* [State](#state)
+		* [Event](#event)
+* [Plugins](#plugins)
+	* [Creating a plugin](#creating-a-plugin)
+	* [Controller events listeners](#controller-events-listeners)
+	* [Controller interface](#controller-interface)
 * [Start the server](#start-the-server)
 	* [Process and logs management](#process-and-logs-management)
 * [Connecting with Domapic Controller](#connecting-with-domapic-controller)
 * [Options](#options)
 	* [Custom options](#custom-options)
 * [Security](#security)
+* [Extending API](#extending-api)
 * [Logs](#logs)
 
 ---
 
-## Introduction
-
-Node.js base for creating [Domapic][website-url] Modules.
+## Modules
 
 A Domapic Module is an action-event-state based REST API Micro-service. Can be, as example, a little program that controls a relay, has an `action` to switch it, triggers an `event` when changes, and an `state` that can be consulted. Modules can be paired with a [Domapic Controller][domapic-controller-url], and be controlled through it, making them interact automatically ones with anothers, or with plugins, such as third-party integrations, as [_Amazon's Alexa_][alexa-url], [_Apple's HomeKit_][homekit-url], etc.
 
@@ -44,7 +47,7 @@ If you are going to __publish your module, add the `domapic-module` suffix to th
 
 > Above, an example of two modules in a [Domapic System][website-url]. Now, the relay can be controlled using the web or mobile applications, or interacting with ["Alexa"][alexa-url] or ["HomeKit"][homekit-url]. Automatisms can be configured in the [Domapic Controller Web UI][domapic-controller-url] to make the [_Phillips Hue_][hue-url] bulb be switched off automatically when the relay bulb is switched on, for example.
 
-## Creating a module
+### Creating a module
 
 Modules can be created with few lines of code. Here is an example of a module controlling a fake relay:
 
@@ -56,7 +59,7 @@ Modules can be created with few lines of code. Here is an example of a module co
   "version": "1.0.0",
   "description": "Domapic module controlling a relay",
   "dependencies": {
-    "domapic-service": "1.0.0-alpha.1"
+    "domapic-service": "1.0.0-alpha.2"
   }
 }
 ```
@@ -87,7 +90,7 @@ domapic.createModule({ packagePath: path.resolve(__dirname) })
           description: 'Switch on/off the relay',
           handler: newStatus => {
             status = newStatus
-            module.emit('switch', status)
+            module.events.emit('switch', status)
             return Promise.resolve(status)
           }
         }
@@ -106,15 +109,19 @@ domapic.createModule({ packagePath: path.resolve(__dirname) })
 * `options` `<object>` containing:
 	* `packagePath` `<string>` Path to the folder where the module's `package.json` is.
 	* `customConfig` `<object>` Domapic provides some common [configuration options](#options). Custom options for a module can be added defining them in this property. In this way, for example, you can add a "gpio" option, that will be received when the module instance is started, and can be modified through arguments in the start command: `npm start -- --gpio=12`. For further info about defining custom configuration options, please refer to the ["custom options" chapter](#custom-options)
-* Returns a module instance, containing:
-	* `tracer` `<object>` containing methods for tracing with different log levels (`log`, `trace`, `debug`, `info`, `warn`, `error`). Read the ["traces" chapter in the domapic-base documentation][domapic-base-url] for further info.
-	* `config` `<object>` containing methods for getting and setting configuration.
-		* `get([key])` - Returns a promise resolved with the module configuration. Resolved with specific property value if argument `key` is provided.
-		* `set(key [, value])` - Sets `value` for provided `key` into module configuration. Returns a promise.
-	* `register(abilitiesData)` - Register provided abilities into the module. Read the [abilities](#abilities) chapter for further info.
-	* `start` - Starts the server. 
 
-## Abilities
+Returns a module instance, containing:
+
+* `tracer` `<object>` containing methods for tracing with different log levels (`log`, `trace`, `debug`, `info`, `warn`, `error`). Read the ["traces" chapter in the domapic-base documentation][domapic-base-url] for further info.
+* `config` `<object>` containing methods for getting and setting configuration.
+	* `get([key])` - Returns a promise resolved with the module configuration. Resolved with specific property value if argument `key` is provided.
+	* `set(key [, value])` - Sets `value` for provided `key` into module configuration. Returns a promise.
+* `api` - Object containing methods for [extending the built-in api](#extending-api).
+* `register(abilitiesData)` - Register provided abilities into the module. Read the [abilities](#abilities) chapter for further info.
+* `start` - Starts the server.
+* `events`- [Node.js emitter object][nodejs-events-url]. Used to emit abilities events to the controller.
+
+### Abilities
 
 Each Module can has many abilities, each one with its own action, state and event. Continuing with the example above, the module could have another ability called "toggle", that would change the status based on current status, without needing to receive any data.
 
@@ -174,12 +181,138 @@ In this example, the action's `handler` method returned `Promise.resolve(true)`.
 
 #### Event
 
-When [ability](#abilities) has an `event` property defined, the `emit` method of the module can be used to trigger the ability event, passing the correspondant data. This will produce module calling to controller api to inform about the trigered event.
+When [ability](#abilities) has an `event` property defined, the `emit` method of the module's `events` object can be used to emit the ability event, passing the correspondant data. This will produce module calling to controller api to inform about the trigered event.
 
 ```js
-module.emit('switch', true)
+module.events.emit('switch', true)
 ```
 In this example, the module will call to the correspondant controller api resource, passing `true` as data.
+
+## Plugins
+
+A Domapic Plugin is an action-event-state based REST API Micro-service that can "extend" the Domapic Controller functionality. Once it is connected with the Controller, it will receive events each time an entity is created, modified or deleted in the Controller. Plugins will be informed too about all module events or actions received by the Controller. Plugins also have an interface to the Controller, that allows to perform actions such as consult module states, dispatch module actions, create users, etc.
+
+If you are going to __publish your plugin, add the `domapic-plugin` suffix to the name__, in order to allow npm users finding it easily searching in the website that keyword.
+
+### Creating a Plugin
+
+Here is an example of a plugin implementation that receives all Controller events, and gets all modules' states once it is connected:
+
+```json
+{
+  "name": "example-domapic-plugin",
+  "version": "1.0.0",
+  "description": "Domapic plugin that receives all Controller events and print logs",
+  "dependencies": {
+    "domapic-service": "1.0.0-alpha.2"
+  }
+}
+```
+
+> server.js file:
+```js
+const path = require('path')
+const domapic = require('domapic-service')
+
+domapic.createPlugin({ packagePath: path.resolve(__dirname) })
+  .then(async plugin => {
+    plugin.events.on('*', eventData => {
+      plugin.tracer.info(`Received ${eventData.entity}:${eventData.operation} event. Data: ${JSON.stringify(eventData.data)}`)
+    })
+
+    plugin.events.on('connection', async () => {
+      const abilities = await plugin.controller.abilities.get()
+      abilities.map(async ability => {
+        if (ability.state) {
+          const state = await plugin.controller.abilities.state(ability._id)
+          console.log(`Ability "${ability.name}" of module "${ability._module}" has state "${state.data}"`)
+        }
+      })
+    })
+
+    return plugin.start()
+  })
+```
+
+> When started and connected with Controller, the plugin will receive all Controller events an print their data. It will also request all registered abilities and print their current states.
+
+#### `createPlugin(options)`
+
+* `options` `<object>` containing:
+	* `packagePath` `<string>` Path to the folder where the plugin's `package.json` is.
+	* `customConfig` `<object>` Domapic provides some common [configuration options](#options). Custom options for a plugin can be added defining them in this property. For further info about defining custom configuration options, please refer to the ["custom options" chapter](#custom-options)
+
+Returns a plugin instance, containing:
+
+* `tracer` `<object>` containing methods for tracing with different log levels (`log`, `trace`, `debug`, `info`, `warn`, `error`). Read the ["traces" chapter in the domapic-base documentation][domapic-base-url] for further info.
+* `config` `<object>` containing methods for getting and setting configuration.
+	* `get([key])` - Returns a promise resolved with the plugin configuration. Resolved with specific property value if argument `key` is provided.
+	* `set(key [, value])` - Sets `value` for provided `key` into module configuration. Returns a promise.
+* `api` - Object containing methods for [extending the built-in api](#extending-api).
+* `start` - Starts the server.
+* `events`- [Node.js emitter object][nodejs-events-url]. Used to subscribe to events from the Controller.
+* `controller` - Object containing an interface to make requests to Controller. Read the [Controller interface chapter for further info](#controller-interface).
+
+### Controller events listeners
+
+Controller emit all module received events and actions, as well as other internal entities events to all registered plugins.
+From a Plugin, you can subscribe to an specific entity events, or to an specific operation, etc.
+
+```js
+plugin.events.on('ability:created', eventData => {
+  console.log('A new ability has been created with data:')
+  console.log(eventData.data)
+})
+```
+
+All available events are:
+
+* ability:updated
+* ability:created
+* ability:deleted
+* ability:action
+* ability:event
+* service:created
+* service:updated
+* service:deleted
+* user:created
+* user:updated
+* user:deleted
+
+Received event data has the next format, where `data` contains all details about the performed operation:
+
+```json
+{
+  "entity": "ability",
+  "operation": "created",
+  "data": {}
+}
+```
+
+Wildcards are available for subscribing to all events of an specific `entity`, or to all entities of an specific `operation`, or to all events:
+
+* `*` - All events
+* `service:*` - All events of "service" entity.
+* `*:created` - All operations "created" of any entity.
+
+### Controller interface
+
+A Domapic Plugin provides an interface that allows to perform operations into the Controller. All methods returns a Promise, and are available under the `plugin.controller` object, which contains:
+
+* `users` - Interface for Controller's "user" entities:
+	* `me()` - Returns data about plugin user
+	* `get([id][,filter])` - Returns users data. Because of security reasons, only "operator" users will be returned. Request can be filtered providing an specific user id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{name:'foo-name'}`).
+	* `create(userData)` - Creates and user, and returns the new `id`. Only creating users with "operator" role is supported.
+* `services`- Interface for Controller's "service" entities:
+	* `get([id][,filter])` - Returns services data. Request can be filtered providing an specific service id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{type:'module'}`).
+* `abilities`- Interface for Controller's "ability" entities:
+	* `get([id][,filter])` - Returns abilities data. Request can be filtered providing an specific ability id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{service:'foo-module-id'}`).
+	* `state(id)` - Returns state of provided ability.
+	* `action(id, data)` - Dispatches ability action with provided data.
+* `logs` - Interface for Controller's "log" entity:
+	* `get()` - Returns Controller logs with all modules' actions and events.
+
+Consult the Controller Swagger interface to get more info about supported filters (queries) and requested data for each api interface.
 
 ## Start the server
 
@@ -242,7 +375,7 @@ You can define __custom CLI commands__ for your module too. For further info rea
 
 ## Connecting with Domapic Controller
 
-Connect your module with [Domapic Controller][domapic-controller-url] inside your local network to get the most of it.
+Connect your module or plugin with [Domapic Controller][domapic-controller-url] inside your local network to get the most of it.
 
 Doing this, you'll can use the Domapic Controller Web Interface to control all your modules, and make them interact through automatisms. Domapic plugins will have access to the module at same time, so you´ll can control it with your voice using the _Amazon's Alexa_ plugin, or the _Homebridge plugin_, for example.
 
@@ -258,11 +391,11 @@ In this way, the module will connect automatically with controller when started.
 
 ### Connect using controller web ui
 
-The connection can be executed using the provided api as well, through the controller web ui. When the module is started, an api key for connecting is displayed in logs:
+The connection can be executed using the provided api as well, through the controller web ui. When the module or plugin is started, an api key for connecting is displayed in logs:
 
 > Try adding connection from Controller, using the next service Api Key: xxxxx-foo-api-key-xxxx
 
-Use the controller web user interface to authorize the connection with your module using the specified api key.
+Use the controller web user interface to authorize the connection with your module or plugin using the specified api key.
 
 ## Options
 
@@ -273,7 +406,7 @@ Domapic-service provides a set of command line options that are available when s
 npm start -- --help
 ```
 
-* `name` - Service instance name. You can start many instances of the same module defining different names for each one.
+* `name` - Service instance name. You can start many instances of the same module or plugin defining different names for each one.
 * `port` - Http port used by the server. Default is 3000.
 * `hostName` - Hostname for the server.
 * `sslCert` - Path to an ssl certificate. The server will start using https protocol if provided.
@@ -357,6 +490,16 @@ relay start --initialStatus=true
 # The module will be started, and "initialStatus" value in config will be true
 ```
 
+## Extending API
+
+The built-in api of Modules and Plugins can be extended to implement your own api resources. For this purpose, the `api` object is provided to module and plugins instances. This object contains methods:
+
+* `extendOpenApi(openApiDefinition)`
+* `addOperations(operationsDefinitions)`
+
+All custom api methods implemented with these methods will require authentication as well as built-in api methods, as long as you remember to define the `"security": [{"apiKey": []}]` property to each openapi path definition.
+
+For further info about how to define api resources using these methods, please refer to the ["Adding api resources" chapter of the Domapic-base documentation](https://npmjs.com/domapic-base#adding-api-resources)
 
 ## Security
 
@@ -419,3 +562,5 @@ Server logs are saved too into a daily file. These files are rotated automatical
 [domapic-base-url]: https://npmjs.com/domapic-base
 [pm2-log-rotate-url]: https://github.com/keymetrics/pm2-logrotate
 [pm2-url]: http://pm2.keymetrics.io/
+[nodejs-events-url]: https://nodejs.org/api/events.html
+

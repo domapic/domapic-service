@@ -28,7 +28,7 @@ domapic.createModule({
         description: 'Switch on/off the relay',
         handler: newStatus => {
           status = newStatus
-          module.emit('switch', status)
+          module.events.emit('switch', status)
           return status
         }
       }

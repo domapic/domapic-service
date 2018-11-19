@@ -13,7 +13,7 @@ domapic.createModule({
     lastCharacter = data
     service.tracer.info('Console Called:', data)
       .then(() => {
-        service.emit('console', data)
+        service.events.emit('console', data)
       })
   }
 

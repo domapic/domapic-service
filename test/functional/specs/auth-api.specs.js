@@ -14,10 +14,21 @@ const findApiKey = function (property, value) {
     })
 }
 
-test.describe('auth api', () => {
+test.describe('auth api', function () {
+  this.timeout(10000)
+  let connection
+
+  test.before(() => {
+    return utils.waitOnestimatedStartTime(2000)
+      .then(() => {
+        connection = new utils.Connection()
+        return Promise.resolve()
+      })
+  })
+
   test.describe('post method', () => {
     test.it('should add a new api key with the provided data', () => {
-      return utils.request('/auth/apikey', {
+      return connection.request('/auth/apikey', {
         method: 'POST',
         body: {
           user: 'foo-user',
@@ -37,7 +48,7 @@ test.describe('auth api', () => {
     })
 
     test.it('should add another key for the same user if the provided user already exists', () => {
-      return utils.request('/auth/apikey', {
+      return connection.request('/auth/apikey', {
         method: 'POST',
         body: {
           user: 'foo-user',
@@ -63,7 +74,7 @@ test.describe('auth api', () => {
     })
 
     test.it('should return an error if the provided reference already exists', () => {
-      return utils.request('/auth/apikey', {
+      return connection.request('/auth/apikey', {
         method: 'POST',
         body: {
           user: 'foo-user-2',
@@ -87,7 +98,7 @@ test.describe('auth api', () => {
     test.it('should delete the provided api key', () => {
       return findApiKey('reference', 'foo-api-key-2')
         .then((apiKey) => {
-          return utils.request(`/auth/apikey/${apiKey.key}`, {
+          return connection.request(`/auth/apikey/${apiKey.key}`, {
             method: 'DELETE'
           }).then((response) => {
             return PromiseB.props({
@@ -104,7 +115,7 @@ test.describe('auth api', () => {
     })
 
     test.it('should return an error if the provided key does not exist', () => {
-      return utils.request(`/auth/apikey/fakeApiKey`, {
+      return connection.request(`/auth/apikey/fakeApiKey`, {
         method: 'DELETE'
       }).then((response) => {
         return test.expect(response.statusCode).to.equal(422)
