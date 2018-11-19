@@ -39,5 +39,15 @@ domapic.createPlugin({
     }
   })
 
+  plugin.events.on('connection', async () => {
+    const abilities = await plugin.controller.abilities.get()
+    abilities.map(async ability => {
+      if (ability.state) {
+        const state = await plugin.controller.abilities.state(ability._id)
+        console.log(`Ability "${ability.name}" of module "${ability._module}" has state "${state.data}"`)
+      }
+    })
+  })
+
   return plugin.start()
 })
