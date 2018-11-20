@@ -15,7 +15,7 @@ test.describe('config api', function () {
       })
   })
 
-  test.it('should return service configuration', () => {
+  test.it('should return module configuration', () => {
     return connection.request('/config', {
       method: 'GET'
     }).then((response) => {

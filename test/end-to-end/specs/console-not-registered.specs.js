@@ -17,7 +17,7 @@ test.describe('when connection with controller failed', function () {
   })
 
   test.it('console have no services registered in controller', () => {
-    return controllerConnection.request('/modules')
+    return controllerConnection.request('/services')
       .then(response => {
         return test.expect(response.body.length).to.equal(0)
       })

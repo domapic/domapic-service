@@ -152,6 +152,9 @@ docker-containers:
   - name: service-container
     build: node-image
     bind: *bind
+  - name: module-container
+    build: node-image
+    bind: *bind
   - name: test-container
     build: node-image
     bind: *bind
@@ -345,6 +348,91 @@ suites:
             command: test/functional/commands/start-cli.sh
             env: *documentation-example-docker-env
       test: *documentation-example-test
+      coverage: *disable-coverage
+  functional-plugin:
+    - name: plugin-no-controller-provided
+      describe: should print an api key valid to launch a pairing command from controller
+      before: *clean
+      services: &plugin-service
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            env:
+              <<: *local-service-auth-env
+              fixture: plugin
+          docker:
+            <<: *docker-service-auth
+            env:
+              <<: *docker-service-auth-env
+              fixture: plugin
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/no-controller-api-key.specs.js
+          - test/functional/specs/not-connected.specs.js
+      coverage: *disable-coverage
+    - name: plugin-api
+      describe: plugin apis should work as expected
+      before: *clean
+      services: *plugin-service
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/auth-api.specs.js
+          - test/functional/plugin-specs/about-api.specs.js
+          - test/functional/plugin-specs/config-api.specs.js
+          - test/functional/plugin-specs/events-api.specs.js
+          - test/functional/plugin-specs/controller-interface.specs.js
+      coverage: *disable-coverage
+    - name: plugin-connection-api-unavailable
+      describe: should try to connect to controller when calling to connection api, and return server unavailable if controller is unavailable
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service
+            env:
+              <<: *local-service-env
+              fixture: plugin
+          docker:
+            <<: *docker-service
+            env:
+              <<: *docker-service-env
+              fixture: plugin
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/no-controller-api-key.specs.js
+          - test/functional/specs/not-connected.specs.js
+          - test/functional/specs/connection-api-unavailable.specs.js
+          - test/functional/specs/not-connected.specs.js
+      coverage: *disable-coverage
+    - name: plugin-cli
+      describe: plugin example should work as expected when started using cli
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            command: test/functional/commands/start-plugin-cli.sh
+            env:
+              <<: *local-service-auth-env
+              fixture: plugin
+          docker:
+            <<: *docker-service-auth
+            command: test/functional/commands/start-plugin-cli.sh
+            env:
+              <<: *docker-service-auth-env
+              fixture: plugin
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/plugin-specs/about-api.specs.js
+          - test/functional/plugin-specs/config-api.specs.js
+      coverage: *disable-coverage
   end-to-end:
     - name: service-connection
       describe: Service should connect to controller when started first time if connection options are provided
@@ -572,4 +660,262 @@ suites:
           - test/end-to-end/specs/connection-api-wrong-key.specs.js
           - test/end-to-end/specs/not-connected.specs.js
           - test/end-to-end/specs/console-not-registered.specs.js
+      coverage: *disable-coverage
+  end-to-end-plugin:
+    - name: plugin-connection
+      describe: Plugin should connect to controller when started first time if connection options are provided
+      before: *e2e-clean
+      services: &plugin-e2e-services
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: plugin
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: plugin
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            env:
+              <<: *e2e-service-service-docker-env
+              fixture: plugin
+              service_name: example-plugin
+          local:
+            <<: *e2e-service-service-local
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: plugin
+              service_name: example-plugin
+      test: &plugin-e2e-test
+        local:
+          <<: *e2e-test-local
+          env:
+            <<: *e2e-test-local-env
+            fixture: plugin
+            service_name: example-plugin
+        docker:
+          <<: *e2e-test-docker
+          env:
+            <<: *e2e-test-docker-env
+            fixture: plugin
+            service_name: example-plugin
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/plugin-specs/plugin-registered.specs.js
+      coverage: *disable-coverage
+    - name: plugin-reconnection
+      describe: Plugin should connect again to controller when restarted
+      services: *plugin-e2e-services
+      test: *plugin-e2e-test
+      coverage: *disable-coverage
+    - name: plugin-reconnection-no-config
+      describe: Plugin should connect again to controller when restarted, even when no config is provided
+      services:
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: plugin
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: plugin
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            command: test/end-to-end/commands/start-service-no-config.sh
+            env:
+              <<: *e2e-service-service-docker-env
+              fixture: plugin
+              service_name: example-plugin
+          local:
+            <<: *e2e-service-service-local
+            command: test/end-to-end/commands/start-service-no-config.sh
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: plugin
+              service_name: example-plugin
+      test: *plugin-e2e-test
+      coverage: *disable-coverage
+    - name: plugin-name-repeated
+      describe: Plugin should not connect to controller if service name is already defined
+      before:
+        local:
+          command: test/end-to-end/commands/clean-service-storage.sh
+          env:
+            service_name: example-plugin
+            domapic_path: .test
+      services:
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: plugin
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: plugin
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            env:
+              <<: *e2e-service-service-docker-env
+              fixture: plugin
+              service_name: example-plugin
+              domapic_path: .shared/.domapic
+          local:
+            <<: *e2e-service-service-local
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: plugin
+              service_name: example-plugin
+      test:
+        <<: *plugin-e2e-test
+        specs:
+          - test/end-to-end/specs/service-repeated.specs.js
+          - test/end-to-end/specs/not-connected.specs.js
+      coverage: *disable-coverage
+    - name: plugin-connection-api
+      describe: Plugin should connect to controller when using connection api
+      before: *e2e-clean
+      services: &plugin-e2e-services-no-controller-config
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: plugin
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: plugin
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            command: test/end-to-end/commands/start-service-no-controller-config.sh
+            env:
+              <<: *e2e-service-service-docker-env
+              fixture: plugin
+              service_name: example-plugin
+          local:
+            <<: *e2e-service-service-local
+            command: test/end-to-end/commands/start-service-no-controller-config.sh
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: plugin
+              service_name: example-plugin
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/not-connected.specs.js
+          - test/end-to-end/plugin-specs/plugin-not-registered.specs.js
+          - test/end-to-end/specs/connection-api.specs.js
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/plugin-specs/plugin-registered.specs.js
+      coverage: *disable-coverage
+    - name: plugin-connection-api-wrong-controller-api-key
+      describe: Plugin should not connect to controller when using connection api with wrong controller apiKey
+      before: *e2e-clean
+      services: *plugin-e2e-services-no-controller-config
+      test:
+        <<: *plugin-e2e-test
+        specs:
+          - test/end-to-end/specs/connection-api-wrong-key.specs.js
+          - test/end-to-end/specs/not-connected.specs.js
+          - test/end-to-end/plugin-specs/plugin-not-registered.specs.js
+      coverage: *disable-coverage
+    - name: plugin-events
+      describe: Plugin should receive controller events, and controller interface should work as expected.
+      before: *e2e-clean
+      services:
+        - *e2e-mongodb-service
+        - name: controller
+          docker:
+            <<: *e2e-controller-service-docker
+            env:
+              <<: *e2e-controller-service-docker-env
+              fixture: plugin-events
+          local:
+            <<: *e2e-controller-service-local
+            env:
+              <<: *e2e-controller-service-local-env
+              fixture: plugin-events
+        - name: service
+          docker:
+            <<: *e2e-service-service-docker
+            env:
+              <<: *e2e-service-service-docker-env
+              fixture: plugin-events
+              service_name: example-plugin
+          local:
+            <<: *e2e-service-service-local
+            env:
+              <<: *e2e-service-service-local-env
+              fixture: plugin-events
+              service_name: example-plugin
+        - name: module
+          docker:
+            container: module-container
+            command: test/end-to-end/commands/start-service.sh
+            wait-on:
+              timeout: 120000
+              resources:
+                - tcp:service-container:3000
+            env:
+              controller_host_name: controller-container
+              service_host_name: module-container
+              service_port: 3200
+              service_name: console-module
+              fixture: console
+              domapic_path: .shared
+          local:
+            command: test/end-to-end/commands/start-service.sh
+            wait-on: tcp:localhost:3100
+            env:
+              controller_host_name: localhost
+              service_host_name: localhost
+              service_port: 3200
+              service_name: console-module
+              fixture: console
+              domapic_path: .test
+      test: &plugin-e2e-test
+        local:
+          <<: *e2e-test-local
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:localhost:3200
+          env:
+            <<: *e2e-test-local-env
+            fixture: plugin-events
+            service_name: example-plugin
+            domapic_path: .test
+        docker:
+          <<: *e2e-test-docker
+          wait-on:
+            timeout: 120000
+            resources:
+              - tcp:module-container:3200
+          env:
+            <<: *e2e-test-docker-env
+            fixture: plugin-events
+            service_name: example-plugin
+            domapic_path: .shared
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/plugin-specs/plugin-registered.specs.js
+          - test/end-to-end/plugin-specs/plugin-events.specs.js
       coverage: *disable-coverage

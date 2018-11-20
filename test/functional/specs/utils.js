@@ -2,6 +2,7 @@
 
 const path = require('path')
 const fs = require('fs')
+const testUtils = require('narval/utils')
 
 const requestPromise = require('request-promise')
 
@@ -75,8 +76,12 @@ class Connection {
   }
 }
 
+const serviceLogs = (time = 200) => waitOnestimatedStartTime(time)
+  .then(() => testUtils.logs.combined('domapic-service'))
+
 module.exports = {
   waitOnestimatedStartTime,
+  serviceLogs,
   request,
   readStorage,
   Connection,

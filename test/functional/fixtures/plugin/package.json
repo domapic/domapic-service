@@ -1,0 +1,12 @@
+{
+  "name": "example-domapic-plugin",
+  "version": "1.0.0",
+  "description": "Domapic plugin for testing purposes",
+  "dependencies": {
+    "domapic-service": "file:../../../../",
+    "lodash": "4.17.11"
+  },
+  "scripts": {
+    "plugin": "./cli.js"
+  }
+}

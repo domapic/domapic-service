@@ -15,7 +15,7 @@ test.describe('about api', function () {
       })
   })
 
-  test.it('should return service information', () => {
+  test.it('should return module information', () => {
     return connection.request('/about', {
       method: 'GET'
     }).then((response) => {

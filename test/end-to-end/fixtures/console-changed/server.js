@@ -12,7 +12,7 @@ domapic.createModule({
   const consoleLog = function (data) {
     lastCharacter = data
     console.log(`Printing into console: ${data}`)
-    service.emit('console', data)
+    service.events.emit('console', data)
   }
 
   return service.register({

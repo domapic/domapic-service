@@ -1,0 +1,73 @@
+{
+  "tags": [{
+    "name": "controller",
+    "description": "Controller interface"
+  }],
+  "components": {
+    "schemas": {
+      "Command": {
+        "description": "Command to be sent to controller",
+        "type": "object",
+        "properties": {
+          "entity": {
+            "description": "Controller entity",
+            "type": "string",
+            "enum": ["users", "services", "abilities", "logs"]
+          },
+          "operation": {
+            "description": "Entity operation",
+            "type": "string",
+            "enum": ["me", "get", "create", "state", "action"]
+          },
+          "id": {
+            "description": "Entity id",
+            "type": "string"
+          },
+          "data": {
+            "description": "Operation data",
+            "type": "object"
+          },
+          "filter": {
+            "description": "Operation filter",
+            "type": "object"
+          }
+        },
+        "required": ["entity", "operation"],
+        "additionalProperties": false,
+        "example": {
+          "entity": "users",
+          "operation": "me"
+        }
+      }
+    }
+  },
+  "paths": {
+    "/controller": {
+      "post": {
+        "tags": ["controller"],
+        "summary": "Controller command",
+        "description": "Sends a command to controller, using plugin command interface",
+        "operationId": "controller",
+        "requestBody": {
+          "description": "Command data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Command"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Controller command success"
+          }
+        },
+        "security": [{
+          "apiKey": []
+        }]
+      }
+    }
+  }
+}
