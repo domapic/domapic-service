@@ -113,9 +113,9 @@
     }
   },
   "anyOf": [{
-    "required": ["description", "data", "event"]
+    "required": ["description", "event"]
   }, {
-    "required": ["description", "data", "action"]
+    "required": ["description", "action"]
   }, {
     "required": ["description", "data", "state"]
   }],

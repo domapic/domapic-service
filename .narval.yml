@@ -295,6 +295,28 @@ suites:
           - test/functional/specs/ability-string-enum.specs.js
           - test/functional/specs/ability-number.specs.js
           - test/functional/specs/ability-number-enum.specs.js
+          - test/functional/specs/ability-no-data.specs.js
+      coverage: *disable-coverage
+    - name: ability-wrong-responses
+      describe: should validate handler responses for each type of ability data
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            env:
+              <<: *local-service-auth-env
+              fixture: abilities-wrong-responses
+          docker:
+            <<: *docker-service-auth
+            env:
+              <<: *docker-service-auth-env
+              fixture: abilities-wrong-responses
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/ability-wrong-responses.specs.js
       coverage: *disable-coverage
     - name: documentation-example
       describe: documentation example should work as expected
