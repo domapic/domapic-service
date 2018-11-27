@@ -26,7 +26,7 @@ test.describe('when using an ability without data', function () {
             .then((log) => {
               return Promise.all([
                 test.expect(response.statusCode).to.equal(200),
-                test.expect(log).to.contain(`Console Called: hello`),
+                test.expect(log).to.contain(`Console Called: undefined`),
                 test.expect(log).to.contain(`Error sending "noDataConsole" event: The service is not connected to Controller`)
               ])
             })
@@ -45,6 +45,24 @@ test.describe('when using an ability without data', function () {
         test.expect(response.statusCode).to.equal(422),
         test.expect(response.body.message).to.contain('additionalProperty "data" exists in instance when not allowed')
       ])
+    })
+  })
+
+  test.it('should not send event when trying to send data', () => {
+    return connection.request('/abilities/no-data-wrong-console/action', {
+      method: 'POST'
+    }).then((response) => {
+      return utils.waitOnestimatedStartTime(100)
+        .then(() => {
+          return testUtils.logs.combined('domapic-service')
+            .then((log) => {
+              return Promise.all([
+                test.expect(response.statusCode).to.equal(200),
+                test.expect(log).to.contain(`Console Called: hello`),
+                test.expect(log).to.contain(`Invalid data in event response "noDataWrongConsole": Data was provided to an ability without data defined`)
+              ])
+            })
+        })
     })
   })
 })

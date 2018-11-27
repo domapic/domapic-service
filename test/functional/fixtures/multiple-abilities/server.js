@@ -149,7 +149,20 @@ domapic.createModule({
       action: {
         description: 'Print hello into console',
         handler: () => {
-          consoleLog('hello', 'noDataConsole')
+          consoleLog(undefined, 'noDataConsole')
+          return Promise.resolve()
+        }
+      }
+    },
+    noDataWrongConsole: {
+      description: 'Prints hello into console',
+      event: {
+        description: 'Console has just printed hello'
+      },
+      action: {
+        description: 'Print hello into console',
+        handler: () => {
+          consoleLog('hello', 'noDataWrongConsole')
           return Promise.resolve()
         }
       }

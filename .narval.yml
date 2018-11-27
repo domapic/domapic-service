@@ -271,6 +271,27 @@ suites:
         specs:
           - test/functional/specs/wrong-ability.specs.js
       coverage: *disable-coverage
+    - name: wrong-ability-no-data
+      describe: should throw an error when trying to register an ability with state and no data
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            env:
+              <<: *local-service-auth-env
+              fixture: wrong-ability-no-data
+          docker:
+            <<: *docker-service-auth
+            env:
+              <<: *docker-service-auth-env
+              fixture: wrong-ability-no-data
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/wrong-ability-no-data.specs.js
+      coverage: *disable-coverage
     - name: ability-data-types
       describe: should work as expected and validate data for each type of ability data
       before: *clean
