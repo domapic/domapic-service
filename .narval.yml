@@ -2,7 +2,6 @@ schemas:
   bind: &bind
     - lib
     - test
-    - cli
     - index.js
   coverage: &disable-coverage
       enabled: false
@@ -183,7 +182,7 @@ suites:
         specs:
           - test/functional/specs/no-controller-api-key.specs.js
           - test/functional/specs/not-connected.specs.js
-          #- test/functional/specs/storage.specs.js
+          - test/functional/specs/storage.specs.js
       coverage: *disable-coverage
     - name: auth-api
       describe: should add or remove api keys
