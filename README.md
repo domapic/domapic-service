@@ -57,11 +57,11 @@ Modules can be created with few lines of code. Here is an example of a module co
 
 ```json
 {
-  "name": "relay-domapic-module",
+  "name": "example-domapic-module",
   "version": "1.0.0",
   "description": "Domapic module controlling a relay",
   "dependencies": {
-    "domapic-service": "1.0.0-alpha.2"
+    "domapic-service": "1.0.0-alpha.3"
   }
 }
 ```

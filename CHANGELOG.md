@@ -6,13 +6,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [unreleased]
 ### Added
+### Changed
+### Fixed
+### Removed
+
+## [1.0.0-alpha.3] - 2018-12-01
+### Added
 - Expose storage method to services
+
 ### Changed
 - Upgrade domapic-base version, which fixes a problem in Client concurrent requests.
 - Do not demand data in abilities. Still mandatory in abilities with state defined.
+
 ### Fixed
 - Extend exposed cli options with service options
-### Removed
 
 ## [1.0.0-alpha.2] - 2018-11-20
 ### BREAKING CHANGES
