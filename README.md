@@ -43,6 +43,8 @@ This package provides you all the API infrastructure, authentication, data valid
 
 If you are going to __publish your module, add the `domapic-module` suffix to the name__, in order to allow npm users finding it easily searching in the website that keyword.
 
+__NOTE: The next schema includes some Domapic pieces that are still not released. The web ui for the Controller, Domapic Cloud, mobile apps, as well as Homekit and Alexa plugins will be available soon.__
+
 ![Domapic system example][domapic-example-image]
 
 > Above, an example of two modules in a [Domapic System][website-url]. Now, the relay can be controlled using the web or mobile applications, or interacting with ["Alexa"][alexa-url] or ["HomeKit"][homekit-url]. Automatisms can be configured in the [Domapic Controller Web UI][domapic-controller-url] to make the [_Phillips Hue_][hue-url] bulb be switched off automatically when the relay bulb is switched on, for example.
@@ -116,6 +118,9 @@ Returns a module instance, containing:
 * `config` `<object>` containing methods for getting and setting configuration.
 	* `get([key])` - Returns a promise resolved with the module configuration. Resolved with specific property value if argument `key` is provided.
 	* `set(key [, value])` - Sets `value` for provided `key` into module configuration. Returns a promise.
+* `storage` `<object>` containing methods for getting and setting data in the built-in file system storage.
+  * `get([key])` - Returns a promise resolved with the module storage. Resolved with specific property value if argument `key` is provided.
+  * `set(key [, value])` - Sets `value` for provided `key` into module storage. Returns a promise.
 * `api` - Object containing methods for [extending the built-in api](#extending-api).
 * `register(abilitiesData)` - Register provided abilities into the module. Read the [abilities](#abilities) chapter for further info.
 * `start` - Starts the server.
