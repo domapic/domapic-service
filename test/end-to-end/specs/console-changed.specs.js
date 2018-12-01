@@ -33,12 +33,12 @@ test.describe('when connection with controller is successful', function () {
       })
   })
 
-  test.it('console ability should be registered in controller', () => {
+  test.it('console abilities should be registered in controller', () => {
     return controllerConnection.request('/abilities')
       .then(response => {
         const ability = response.body.find(ability => ability.name === 'console')
         return Promise.all([
-          test.expect(response.body.length).to.equal(1),
+          test.expect(response.body.length).to.equal(3),
           test.expect(ability._service).to.equal(serviceId),
           test.expect(ability._user).to.equal(serviceUserId),
           test.expect(ability.event).to.equal(true),

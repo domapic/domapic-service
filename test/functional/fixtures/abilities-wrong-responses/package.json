@@ -1,0 +1,8 @@
+{
+  "name": "console-domapic",
+  "version": "1.0.0",
+  "description": "Example of Node.js Domapic service with many abilities",
+  "dependencies": {
+    "domapic-service": "file:../../../../"
+  }
+}

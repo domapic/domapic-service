@@ -43,6 +43,8 @@ This package provides you all the API infrastructure, authentication, data valid
 
 If you are going to __publish your module, add the `domapic-module` suffix to the name__, in order to allow npm users finding it easily searching in the website that keyword.
 
+__NOTE: The next schema includes some Domapic pieces that are still not released. The web ui for the Controller, Domapic Cloud, mobile apps, as well as Homekit and Alexa plugins will be available soon.__
+
 ![Domapic system example][domapic-example-image]
 
 > Above, an example of two modules in a [Domapic System][website-url]. Now, the relay can be controlled using the web or mobile applications, or interacting with ["Alexa"][alexa-url] or ["HomeKit"][homekit-url]. Automatisms can be configured in the [Domapic Controller Web UI][domapic-controller-url] to make the [_Phillips Hue_][hue-url] bulb be switched off automatically when the relay bulb is switched on, for example.
@@ -55,11 +57,11 @@ Modules can be created with few lines of code. Here is an example of a module co
 
 ```json
 {
-  "name": "relay-domapic-module",
+  "name": "example-domapic-module",
   "version": "1.0.0",
   "description": "Domapic module controlling a relay",
   "dependencies": {
-    "domapic-service": "1.0.0-alpha.2"
+    "domapic-service": "1.0.0-alpha.3"
   }
 }
 ```
@@ -70,10 +72,10 @@ const path = require('path')
 const domapic = require('domapic-service')
 
 domapic.createModule({ packagePath: path.resolve(__dirname) })
-  .then(async module => {
+  .then(async dmpcModule => {
     let status = false
 
-    await module.register({
+    await dmpcModule.register({
       switch: {
         description: 'Handle the relay status',
         data: {
@@ -90,14 +92,14 @@ domapic.createModule({ packagePath: path.resolve(__dirname) })
           description: 'Switch on/off the relay',
           handler: newStatus => {
             status = newStatus
-            module.events.emit('switch', status)
+            dmpcModule.events.emit('switch', status)
             return Promise.resolve(status)
           }
         }
       }
     })
 
-    return module.start()
+    return dmpcModule.start()
   })
 ```
 > When started, a REST api will be available to connect with controller, authenticate using api key, dispatch the switch action, consulting the switch state, the module configuration, etc.
@@ -116,6 +118,9 @@ Returns a module instance, containing:
 * `config` `<object>` containing methods for getting and setting configuration.
 	* `get([key])` - Returns a promise resolved with the module configuration. Resolved with specific property value if argument `key` is provided.
 	* `set(key [, value])` - Sets `value` for provided `key` into module configuration. Returns a promise.
+* `storage` `<object>` containing methods for getting and setting data in the built-in file system storage.
+  * `get([key])` - Returns a promise resolved with the module storage. Resolved with specific property value if argument `key` is provided.
+  * `set(key [, value])` - Sets `value` for provided `key` into module storage. Returns a promise.
 * `api` - Object containing methods for [extending the built-in api](#extending-api).
 * `register(abilitiesData)` - Register provided abilities into the module. Read the [abilities](#abilities) chapter for further info.
 * `start` - Starts the server.
@@ -132,7 +137,7 @@ Each Module can has many abilities, each one with its own action, state and even
 Each ability must be an object, which key will be the name of the ability (will be converted to snake case when referenced in api uris). Properties of each ability must be:
 
 * `description` `<string>` Description of the ability.
-* `data` `<object>` Defines the type of data that the ability will handle, and will be used to execute data validation for the action, state and event related api resources.
+* `data` `<object>` Defines the type of data that the ability will handle, and will be used to execute data validation for the action, state and event related api resources. If the ability don't needs any type of data, this property should be omitted (in that case, the ability can't have an state, because it has no sense).
 	* `type` `<string>` Type of data. Can be one of `string`, `boolean`, `number`, `integer` or `float`
 	* `enum` `<array>` Used to restrict data to a fixed set of values. It must be an array with at least one element, where each element is unique.
 	* `minLength` `<number>` Minimum length of the data string.
@@ -157,7 +162,7 @@ Each ability must be an object, which key will be the name of the ability (will 
 
 #### Action
 
-When an [ability](#abilities) has an `action` property defined, an api resource will be created with the uri `/api/[ability_key]/action`. It has to be requested using `POST` method, and data has to be provided in the request body, contained in the "data" property:
+When an [ability](#abilities) has an `action` property defined, an api resource will be created with the uri `/api/[ability_key]/action`. It has to be requested using `POST` method, and data (if needed) has to be provided in the request body, contained in the "data" property:
 
 > Example: http://localhost:3000/api/switch/action
 ```json
@@ -319,7 +324,7 @@ Consult the Controller Swagger interface to get more info about supported filter
 First of all, remember to start the server programatically after adding the abilities in your code:
 
 ```js
-module.start()
+dmpcModule.start()
 ```
 
 Once the module code is ready, the server can be started calling directly to the `npm start` command
@@ -418,6 +423,7 @@ npm start -- --help
 * `logLevel` - Tracing level. Choices are 'log', 'trace', 'debug', 'info', 'warn' and 'error'. Default is `info`.
 * `path` - Path to be used as home path for the process, instead of user´s default (a `.domapic` folder will be created inside).
 * `saveConfig` - Save current options for next execution (except `name` and `path`). Default is false.
+* `rejectUntrusted` - Reject untrusted ssl certificates when making requests to modules or plugins. Use it if you are using a self-signed certificate in your Controller. Default is false.
 
 > Example of defining options from command line:
 
@@ -455,8 +461,8 @@ const options = require('./options')
 domapic.createModule({
   packagePath: path.resolve(__dirname),
   customConfig: options
-}).then(async module => {
-  let status = await module.config.get('initialStatus')
+}).then(async dmpcModule => {
+  let status = await dmpcModule.config.get('initialStatus')
   //...
 })
 ```
@@ -523,9 +529,9 @@ npm run relay logs -- --lines=300
 
 This command will display last logs of server, and will continue displaying logs until CTRL-C is pressed.
 
-Server logs are managed by [PM2][pm2-url] when using CLI, so, it is recommended to install [_PM2 log rotate_][pm2-log-rotate-url] to avoid pm2 logs file growing too much.
+Service process and logs are managed by [PM2][pm2-url] when using CLI, so, it is recommended to install [_PM2 log rotate_][pm2-log-rotate-url] to avoid pm2 logs file growing too much.
 
-Server logs are saved too into a daily file. These files are rotated automatically and only last ten days files are kept. You´ll find these files in the `~/.domapic/[module-name]/logs` folder.
+Service logs are saved too into a daily file. These files are rotated automatically and only last ten days files are kept. You´ll find these files in the `~/.domapic/[module-name]/logs` folder.
 
 
 [domapic-logo-image]: http://domapic.com/assets/domapic-logo.png

@@ -2,7 +2,6 @@ schemas:
   bind: &bind
     - lib
     - test
-    - cli
     - index.js
   coverage: &disable-coverage
       enabled: false
@@ -183,6 +182,7 @@ suites:
         specs:
           - test/functional/specs/no-controller-api-key.specs.js
           - test/functional/specs/not-connected.specs.js
+          - test/functional/specs/storage.specs.js
       coverage: *disable-coverage
     - name: auth-api
       describe: should add or remove api keys
@@ -271,6 +271,27 @@ suites:
         specs:
           - test/functional/specs/wrong-ability.specs.js
       coverage: *disable-coverage
+    - name: wrong-ability-no-data
+      describe: should throw an error when trying to register an ability with state and no data
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            env:
+              <<: *local-service-auth-env
+              fixture: wrong-ability-no-data
+          docker:
+            <<: *docker-service-auth
+            env:
+              <<: *docker-service-auth-env
+              fixture: wrong-ability-no-data
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/wrong-ability-no-data.specs.js
+      coverage: *disable-coverage
     - name: ability-data-types
       describe: should work as expected and validate data for each type of ability data
       before: *clean
@@ -295,6 +316,28 @@ suites:
           - test/functional/specs/ability-string-enum.specs.js
           - test/functional/specs/ability-number.specs.js
           - test/functional/specs/ability-number-enum.specs.js
+          - test/functional/specs/ability-no-data.specs.js
+      coverage: *disable-coverage
+    - name: ability-wrong-responses
+      describe: should validate handler responses for each type of ability data
+      before: *clean
+      services:
+        - name: domapic-service
+          abort-on-error: true
+          local:
+            <<: *local-service-auth
+            env:
+              <<: *local-service-auth-env
+              fixture: abilities-wrong-responses
+          docker:
+            <<: *docker-service-auth
+            env:
+              <<: *docker-service-auth-env
+              fixture: abilities-wrong-responses
+      test:
+        <<: *functional-test
+        specs:
+          - test/functional/specs/ability-wrong-responses.specs.js
       coverage: *disable-coverage
     - name: documentation-example
       describe: documentation example should work as expected
@@ -308,14 +351,14 @@ suites:
             env: &documentation-example-local-env
               <<: *local-service-auth-env
               fixture: example
-              service_extra_options: --authDisabled --initialStatus=true
+              service_extra_options: --authDisabled --initialStatus=true --controllerApiKey=foo
           docker:
             <<: *docker-service-auth
             command: test/functional/commands/start-service-no-name.sh
             env: &documentation-example-docker-env
               <<: *docker-service-auth-env
               fixture: example
-              service_extra_options: --authDisabled --initialStatus=true
+              service_extra_options: --authDisabled --initialStatus=true --controllerApiKey=foo
       test: &documentation-example-test
         <<: *functional-test
         local:

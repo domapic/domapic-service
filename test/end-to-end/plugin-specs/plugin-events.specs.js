@@ -9,6 +9,7 @@ test.describe('plugin controller interface and events', function () {
   let userId
   let consoleServiceId
   let consoleAbilityId
+  let consoleNoDataAbilityId
 
   const requestController = (entity, operation, options = {}) => {
     const body = {
@@ -122,12 +123,15 @@ test.describe('plugin controller interface and events', function () {
   test.describe('controller interface for getting abilities', () => {
     test.it('should return all abilities', () => {
       return requestController('abilities', 'get').then(response => {
-        const console = response.body.find(ability => ability._service === consoleServiceId)
+        const console = response.body.find(ability => ability._service === consoleServiceId && ability.name === 'console')
+        const consoleNoData = response.body.find(ability => ability._service === consoleServiceId && ability.name === 'consoleNoData')
         consoleAbilityId = console._id
+        consoleNoDataAbilityId = consoleNoData._id
         return Promise.all([
           test.expect(response.statusCode).to.equal(200),
-          test.expect(response.body.length).to.equal(1),
-          test.expect(console).to.not.be.undefined()
+          test.expect(response.body.length).to.equal(3),
+          test.expect(console).to.not.be.undefined(),
+          test.expect(consoleNoDataAbilityId).to.not.be.undefined()
         ])
       })
     })
@@ -190,18 +194,50 @@ test.describe('plugin controller interface and events', function () {
     })
   })
 
+  test.describe('when using controller interface for dispatching ability action with no data', () => {
+    test.it('should return ability action response', () => {
+      return requestController('abilities', 'action', {
+        id: consoleNoDataAbilityId
+      }).then(response => {
+        return Promise.all([
+          test.expect(response.statusCode).to.equal(200)
+        ])
+      })
+    })
+
+    test.it('should have received an event from controller about dispatched action', () => {
+      return utils.serviceLogs(500)
+        .then(logs => {
+          return Promise.all([
+            test.expect(logs).to.contain(`Received ability:action event. Data: {"_id":"${consoleNoDataAbilityId}"}`)
+          ])
+        })
+    })
+
+    test.it('should have received an event from controller about triggered event', () => {
+      return utils.serviceLogs()
+        .then(logs => {
+          return Promise.all([
+            test.expect(logs).to.contain(`Received ability:event event. Data: {"_id":"${consoleNoDataAbilityId}"}`)
+          ])
+        })
+    })
+  })
+
   test.describe('controller interface for getting logs', () => {
     test.it('should return logs', () => {
       return requestController('logs', 'get').then(response => {
-        const action = response.body.find(log => log.type === 'action')
-        const event = response.body.find(log => log.type === 'event')
+        const action = response.body.find(log => log.type === 'action' && log._ability === consoleAbilityId)
+        const event = response.body.find(log => log.type === 'event' && log._ability === consoleAbilityId)
+        const actionNoData = response.body.find(log => log.type === 'action' && log._ability === consoleNoDataAbilityId)
+        const eventNoData = response.body.find(log => log.type === 'event' && log._ability === consoleNoDataAbilityId)
         return Promise.all([
           test.expect(response.statusCode).to.equal(200),
-          test.expect(response.body.length).to.equal(2),
+          test.expect(response.body.length).to.equal(4),
           test.expect(action.data).to.equal('a'),
           test.expect(event.data).to.equal('a'),
-          test.expect(event._ability).to.equal(consoleAbilityId),
-          test.expect(action._ability).to.equal(consoleAbilityId)
+          test.expect(actionNoData.data).to.be.undefined(),
+          test.expect(eventNoData.data).to.be.undefined()
         ])
       })
     })

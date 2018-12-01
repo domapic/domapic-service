@@ -19,8 +19,10 @@ const ServiceCreator = function (Builder, type) {
 const createModule = new ServiceCreator(serviceHandlers.Module, SERVICE_TYPES.MODULE)
 const createPlugin = new ServiceCreator(serviceHandlers.Plugin, SERVICE_TYPES.PLUGIN)
 
+const cli = cliOptions => domapic.cli(options.extendWith(cliOptions))
+
 module.exports = {
   createModule,
   createPlugin,
-  cli: domapic.cli
+  cli
 }

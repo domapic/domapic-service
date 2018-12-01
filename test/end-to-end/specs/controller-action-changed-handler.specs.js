@@ -32,8 +32,7 @@ test.describe('when using controller action api to dispatch module action', func
           return testUtils.logs.combined('service')
             .then((log) => {
               return Promise.all([
-                test.expect(response.statusCode).to.equal(422),
-                test.expect(log).to.not.contain('Printing into console:')
+                test.expect(response.statusCode).to.equal(422)
               ])
             })
         })

@@ -6,6 +6,6 @@
     "domapic-controller": "node_modules/.bin/domapic-controller"
   },
   "dependencies": {
-    "domapic-controller": "1.0.0-alpha.9"
+    "domapic-controller": "1.0.0-alpha.11"
   }
 }

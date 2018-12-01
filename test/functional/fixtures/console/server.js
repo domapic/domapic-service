@@ -6,7 +6,7 @@ const domapic = require('../../../../index')
 
 domapic.createModule({
   packagePath: path.resolve(__dirname)
-}).then((service) => {
+}).then(async service => {
   let lastCharacter
 
   const consoleLog = function (data) {
@@ -17,7 +17,9 @@ domapic.createModule({
       })
   }
 
-  return service.register({
+  await service.storage.set('storageTest', 'foo-storage-value')
+
+  await service.register({
     console: {
       description: 'Handle custom console logs',
       data: {
@@ -40,5 +42,7 @@ domapic.createModule({
         }
       }
     }
-  }).then(service.start)
+  })
+
+  return service.start()
 })
