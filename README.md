@@ -72,10 +72,10 @@ const path = require('path')
 const domapic = require('domapic-service')
 
 domapic.createModule({ packagePath: path.resolve(__dirname) })
-  .then(async module => {
+  .then(async dmpcModule => {
     let status = false
 
-    await module.register({
+    await dmpcModule.register({
       switch: {
         description: 'Handle the relay status',
         data: {
@@ -92,14 +92,14 @@ domapic.createModule({ packagePath: path.resolve(__dirname) })
           description: 'Switch on/off the relay',
           handler: newStatus => {
             status = newStatus
-            module.events.emit('switch', status)
+            dmpcModule.events.emit('switch', status)
             return Promise.resolve(status)
           }
         }
       }
     })
 
-    return module.start()
+    return dmpcModule.start()
   })
 ```
 > When started, a REST api will be available to connect with controller, authenticate using api key, dispatch the switch action, consulting the switch state, the module configuration, etc.
@@ -324,7 +324,7 @@ Consult the Controller Swagger interface to get more info about supported filter
 First of all, remember to start the server programatically after adding the abilities in your code:
 
 ```js
-module.start()
+dmpcModule.start()
 ```
 
 Once the module code is ready, the server can be started calling directly to the `npm start` command
@@ -461,8 +461,8 @@ const options = require('./options')
 domapic.createModule({
   packagePath: path.resolve(__dirname),
   customConfig: options
-}).then(async module => {
-  let status = await module.config.get('initialStatus')
+}).then(async dmpcModule => {
+  let status = await dmpcModule.config.get('initialStatus')
   //...
 })
 ```
