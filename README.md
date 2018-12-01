@@ -137,7 +137,7 @@ Each Module can has many abilities, each one with its own action, state and even
 Each ability must be an object, which key will be the name of the ability (will be converted to snake case when referenced in api uris). Properties of each ability must be:
 
 * `description` `<string>` Description of the ability.
-* `data` `<object>` Defines the type of data that the ability will handle, and will be used to execute data validation for the action, state and event related api resources.
+* `data` `<object>` Defines the type of data that the ability will handle, and will be used to execute data validation for the action, state and event related api resources. If the ability don't needs any type of data, this property should be omitted (in that case, the ability can't have an state, because it has no sense).
 	* `type` `<string>` Type of data. Can be one of `string`, `boolean`, `number`, `integer` or `float`
 	* `enum` `<array>` Used to restrict data to a fixed set of values. It must be an array with at least one element, where each element is unique.
 	* `minLength` `<number>` Minimum length of the data string.
@@ -162,7 +162,7 @@ Each ability must be an object, which key will be the name of the ability (will 
 
 #### Action
 
-When an [ability](#abilities) has an `action` property defined, an api resource will be created with the uri `/api/[ability_key]/action`. It has to be requested using `POST` method, and data has to be provided in the request body, contained in the "data" property:
+When an [ability](#abilities) has an `action` property defined, an api resource will be created with the uri `/api/[ability_key]/action`. It has to be requested using `POST` method, and data (if needed) has to be provided in the request body, contained in the "data" property:
 
 > Example: http://localhost:3000/api/switch/action
 ```json
@@ -423,6 +423,7 @@ npm start -- --help
 * `logLevel` - Tracing level. Choices are 'log', 'trace', 'debug', 'info', 'warn' and 'error'. Default is `info`.
 * `path` - Path to be used as home path for the process, instead of user´s default (a `.domapic` folder will be created inside).
 * `saveConfig` - Save current options for next execution (except `name` and `path`). Default is false.
+* `rejectUntrusted` - Reject untrusted ssl certificates when making requests to modules or plugins. Use it if you are using a self-signed certificate in your Controller. Default is false.
 
 > Example of defining options from command line:
 
@@ -528,9 +529,9 @@ npm run relay logs -- --lines=300
 
 This command will display last logs of server, and will continue displaying logs until CTRL-C is pressed.
 
-Server logs are managed by [PM2][pm2-url] when using CLI, so, it is recommended to install [_PM2 log rotate_][pm2-log-rotate-url] to avoid pm2 logs file growing too much.
+Service process and logs are managed by [PM2][pm2-url] when using CLI, so, it is recommended to install [_PM2 log rotate_][pm2-log-rotate-url] to avoid pm2 logs file growing too much.
 
-Server logs are saved too into a daily file. These files are rotated automatically and only last ten days files are kept. You´ll find these files in the `~/.domapic/[module-name]/logs` folder.
+Service logs are saved too into a daily file. These files are rotated automatically and only last ten days files are kept. You´ll find these files in the `~/.domapic/[module-name]/logs` folder.
 
 
 [domapic-logo-image]: http://domapic.com/assets/domapic-logo.png
