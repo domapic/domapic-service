@@ -29,7 +29,8 @@ test.describe('config api', function () {
           authDisabled: [],
           hostName: utils.SERVICE_HOST,
           path: path.resolve(__dirname, '..', '..', '..', utils.DOMAPIC_PATH),
-          rejectUntrusted: false
+          rejectUntrusted: false,
+          controllerApiKey: 'foo'
         })
       ])
     })

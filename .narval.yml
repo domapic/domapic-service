@@ -352,14 +352,14 @@ suites:
             env: &documentation-example-local-env
               <<: *local-service-auth-env
               fixture: example
-              service_extra_options: --authDisabled --initialStatus=true
+              service_extra_options: --authDisabled --initialStatus=true --controllerApiKey=foo
           docker:
             <<: *docker-service-auth
             command: test/functional/commands/start-service-no-name.sh
             env: &documentation-example-docker-env
               <<: *docker-service-auth-env
               fixture: example
-              service_extra_options: --authDisabled --initialStatus=true
+              service_extra_options: --authDisabled --initialStatus=true --controllerApiKey=foo
       test: &documentation-example-test
         <<: *functional-test
         local:
