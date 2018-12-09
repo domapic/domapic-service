@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 ### Removed
 
+## [1.0.0-alpha.4] - 2018-12-09
+
 ## [1.0.0-alpha.3] - 2018-12-01
 ### Added
 - Expose storage method to services
