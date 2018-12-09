@@ -10,9 +10,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 ### Removed
 
+## [1.0.0-alpha.4] - 2018-12-09
+### Added
+- Expose errors constructors to services
+
+### Changed
+- Upgrade domapic-base version, which expose new `getPath` method in storage.
+
 ## [1.0.0-alpha.3] - 2018-12-01
 ### Added
-- Expose storage method to services
+- Expose storage methods to services
 
 ### Changed
 - Upgrade domapic-base version, which fixes a problem in Client concurrent requests.
