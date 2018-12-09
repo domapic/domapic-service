@@ -125,6 +125,7 @@ Returns a module instance, containing:
 * `register(abilitiesData)` - Register provided abilities into the module. Read the [abilities](#abilities) chapter for further info.
 * `start` - Starts the server.
 * `events`- [Node.js emitter object][nodejs-events-url]. Used to emit abilities events to the controller.
+* `errors` - Domapic errors constructors. Useful for rejecting abilities handlers with specific http errors. For further info read the [errors chapter in the domapic-base documentation][domapic-base-url]
 
 ### Abilities
 
