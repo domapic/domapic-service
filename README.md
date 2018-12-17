@@ -20,6 +20,7 @@
 		* [Action](#action)
 		* [State](#state)
 		* [Event](#event)
+  * [Plugins configurations](#plugins-configurations)
 * [Plugins](#plugins)
 	* [Creating a plugin](#creating-a-plugin)
 	* [Controller events listeners](#controller-events-listeners)
@@ -123,6 +124,7 @@ Returns a module instance, containing:
   * `set(key [, value])` - Sets `value` for provided `key` into module storage. Returns a promise.
 * `api` - Object containing methods for [extending the built-in api](#extending-api).
 * `register(abilitiesData)` - Register provided abilities into the module. Read the [abilities](#abilities) chapter for further info.
+* `addPluginConfig(pluginConfigs)` - Add module default configurations for domapic plugins. Read the [Plugins configurations](#plugins-configurations) chapter for further info.
 * `start` - Starts the server.
 * `events`- [Node.js emitter object][nodejs-events-url]. Used to emit abilities events to the controller.
 * `errors` - Domapic errors constructors. Useful for rejecting abilities handlers with specific http errors. For further info read the [errors chapter in the domapic-base documentation][domapic-base-url]
@@ -190,9 +192,30 @@ In this example, the action's `handler` method returned `Promise.resolve(true)`.
 When [ability](#abilities) has an `event` property defined, the `emit` method of the module's `events` object can be used to emit the ability event, passing the correspondant data. This will produce module calling to controller api to inform about the trigered event.
 
 ```js
-module.events.emit('switch', true)
+dmpcModule.events.emit('switch', true)
 ```
 In this example, the module will call to the correspondant controller api resource, passing `true` as data.
+
+### Plugins configurations
+
+Some Domapic Plugins require extra configurations for modules _(as an example, the `homebridge-domapic-plugin` needs to map the module abilities to an specific HomeKit accesory type, in order to be controlled by Siri)_.  The modules can define a default configuration for certain types of Domapic Plugins. This configurations can be modified afterwards by users through the Controller UI in order to allow more customization, _(for example, a `contact-sensor-domapic-module` sometimes needs to be mapped to a `Door` accesory, and sometimes to a `Window` accesory)_
+
+For defining default plugins configurations, the `addPluginConfig` method is available in the module instances:
+
+#### `addPluginConfig(pluginConfigs)`
+
+Add plugin configuration or configurations (can receive an array of configurations too). Each configuration must have the next properties:
+* `pluginPackageName` `<string>` Package name of the plugin for which the configuration is destined.
+* `config` `<object>` Object containing the plugin configuration. Its format depends of each specific plugin configuration requisites.
+
+```js
+dmpcModule.addPluginConfig({
+  pluginPackageName: 'homebridge-domapic-plugin',
+  config: {
+    foo: 'foo-plugin-config'
+  }
+})
+```
 
 ## Plugins
 

@@ -489,6 +489,7 @@ suites:
         specs:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-registered.specs.js
+          - test/end-to-end/specs/console-plugin-config-registered.specs.js
           - test/end-to-end/specs/controller-action-handler.specs.js
           - test/end-to-end/specs/controller-state-handler.specs.js
       coverage: *disable-coverage
@@ -503,6 +504,7 @@ suites:
         specs:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-registered.specs.js
+          - test/end-to-end/specs/console-plugin-config-registered.specs.js
           - test/end-to-end/specs/controller-action-handler.specs.js
           - test/end-to-end/specs/controller-state-handler.specs.js
       coverage: *disable-coverage
@@ -523,6 +525,7 @@ suites:
         specs:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-registered.specs.js
+          - test/end-to-end/specs/console-plugin-config-registered.specs.js
           - test/end-to-end/specs/controller-action-handler.specs.js
           - test/end-to-end/specs/controller-state-handler.specs.js
       coverage: *disable-coverage
@@ -578,6 +581,7 @@ suites:
         specs:
           - test/end-to-end/specs/service-connection.specs.js
           - test/end-to-end/specs/console-changed.specs.js
+          - test/end-to-end/specs/console-plugin-config-changed.specs.js
           - test/end-to-end/specs/controller-action-handler.specs.js
           - test/end-to-end/specs/controller-state-handler.specs.js
       coverage: *disable-coverage

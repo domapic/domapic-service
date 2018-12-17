@@ -1,0 +1,11 @@
+[{
+  "pluginPackageName": "foo-domapic-plugin",
+  "config": {
+    "foo": "foo-config"
+  }
+}, {
+  "pluginPackageName": "foo-domapic-plugin-2",
+  "config": {
+    "foo": "foo-config-2"
+  }
+}]
