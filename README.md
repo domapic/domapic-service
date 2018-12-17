@@ -16,7 +16,7 @@
 
 * [Modules](#modules)
 	* [Creating a module](#creating-a-module)
-	* [Abilities](#registering-abilities)
+	* [Abilities](#abilities)
 		* [Action](#action)
 		* [State](#state)
 		* [Event](#event)
@@ -281,6 +281,9 @@ All available events are:
 * service:created
 * service:updated
 * service:deleted
+* servicePluginConfig:created
+* servicePluginConfig:updated
+* servicePluginConfig:deleted
 * user:created
 * user:updated
 * user:deleted
@@ -308,9 +311,13 @@ A Domapic Plugin provides an interface that allows to perform operations into th
 * `users` - Interface for Controller's "user" entities:
 	* `me()` - Returns data about plugin user
 	* `get([id][,filter])` - Returns users data. Because of security reasons, only "operator" users will be returned. Request can be filtered providing an specific user id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{name:'foo-name'}`).
-	* `create(userData)` - Creates and user, and returns the new `id`. Only creating users with "operator" role is supported.
+	* `create(userData)` - Creates an user, and returns the new `id`. Only creating users with "operator" role is supported.
 * `services`- Interface for Controller's "service" entities:
 	* `get([id][,filter])` - Returns services data. Request can be filtered providing an specific service id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{type:'module'}`).
+* `servicePluginConfigs`- Interface for Controller's "servicePluginConfigs" entities:
+  * `get([id][,filter])` - Returns servicePluginConfigs data. Request can be filtered providing an specific servicePluginConfig id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{service:'service-id', 'plugin-package-name': 'foo-plugin-package-name'}`).
+  * `create(configData)` - Creates a service plugin configuratin, and returns the new `id`.
+  * `update(id, configData)` - Updates an specific service plugin configuration.
 * `abilities`- Interface for Controller's "ability" entities:
 	* `get([id][,filter])` - Returns abilities data. Request can be filtered providing an specific ability id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{service:'foo-module-id'}`).
 	* `state(id)` - Returns state of provided ability.

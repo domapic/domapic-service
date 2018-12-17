@@ -27,10 +27,10 @@
     "coveralls": "cat ./.coverage/unit/lcov.info | coveralls"
   },
   "dependencies": {
-    "bluebird": "3.5.1",
+    "bluebird": "3.5.3",
     "domapic-base": "1.0.0-beta.18",
     "is-promise": "2.1.0",
-    "lodash": "4.17.10",
+    "lodash": "4.17.11",
     "rand-token": "0.4.0",
     "jsonschema": "1.2.4",
     "deep-equal": "1.0.1",
