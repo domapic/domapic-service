@@ -2,11 +2,12 @@
 
 const path = require('path')
 
+const pluginConfigs = require('./pluginConfigs.json')
 const domapic = require('../../../../index')
 
 domapic.createModule({
   packagePath: path.resolve(__dirname)
-}).then((service) => {
+}).then(async service => {
   let lastCharacter
 
   const consoleLog = function (data, eventName) {
@@ -15,7 +16,7 @@ domapic.createModule({
     service.events.emit(eventName, data)
   }
 
-  return service.register({
+  await service.register({
     console: {
       description: 'Handle console log version 2',
       data: {
@@ -74,5 +75,9 @@ domapic.createModule({
         }
       }
     }
-  }).then(service.start)
+  })
+
+  await service.addPluginConfig(pluginConfigs)
+
+  return service.start()
 })

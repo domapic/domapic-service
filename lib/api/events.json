@@ -12,7 +12,7 @@
           "entity": {
             "description": "Controller entity to which event is related",
             "type": "string",
-            "enum": ["ability", "service", "user"]
+            "enum": ["ability", "service", "user", "servicePluginConfig"]
           },
           "operation": {
             "description": "Operation applied to entity",

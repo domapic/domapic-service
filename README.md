@@ -16,10 +16,11 @@
 
 * [Modules](#modules)
 	* [Creating a module](#creating-a-module)
-	* [Abilities](#registering-abilities)
+	* [Abilities](#abilities)
 		* [Action](#action)
 		* [State](#state)
 		* [Event](#event)
+  * [Plugins configurations](#plugins-configurations)
 * [Plugins](#plugins)
 	* [Creating a plugin](#creating-a-plugin)
 	* [Controller events listeners](#controller-events-listeners)
@@ -61,7 +62,7 @@ Modules can be created with few lines of code. Here is an example of a module co
   "version": "1.0.0",
   "description": "Domapic module controlling a relay",
   "dependencies": {
-    "domapic-service": "1.0.0-alpha.3"
+    "domapic-service": "1.0.0-alpha.5"
   }
 }
 ```
@@ -123,6 +124,7 @@ Returns a module instance, containing:
   * `set(key [, value])` - Sets `value` for provided `key` into module storage. Returns a promise.
 * `api` - Object containing methods for [extending the built-in api](#extending-api).
 * `register(abilitiesData)` - Register provided abilities into the module. Read the [abilities](#abilities) chapter for further info.
+* `addPluginConfig(pluginConfigs)` - Add module default configurations for domapic plugins. Read the [Plugins configurations](#plugins-configurations) chapter for further info.
 * `start` - Starts the server.
 * `events`- [Node.js emitter object][nodejs-events-url]. Used to emit abilities events to the controller.
 * `errors` - Domapic errors constructors. Useful for rejecting abilities handlers with specific http errors. For further info read the [errors chapter in the domapic-base documentation][domapic-base-url]
@@ -190,9 +192,30 @@ In this example, the action's `handler` method returned `Promise.resolve(true)`.
 When [ability](#abilities) has an `event` property defined, the `emit` method of the module's `events` object can be used to emit the ability event, passing the correspondant data. This will produce module calling to controller api to inform about the trigered event.
 
 ```js
-module.events.emit('switch', true)
+dmpcModule.events.emit('switch', true)
 ```
 In this example, the module will call to the correspondant controller api resource, passing `true` as data.
+
+### Plugins configurations
+
+Some Domapic Plugins require extra configurations for modules _(as an example, the `homebridge-domapic-plugin` needs to map the module abilities to an specific HomeKit accesory type, in order to be controlled by Siri)_.  The modules can define a default configuration for certain types of Domapic Plugins. This configurations can be modified afterwards by users through the Controller UI in order to allow more customization, _(for example, a `contact-sensor-domapic-module` sometimes needs to be mapped to a `Door` accesory, and sometimes to a `Window` accesory)_
+
+For defining default plugins configurations, the `addPluginConfig` method is available in the module instances:
+
+#### `addPluginConfig(pluginConfigs)`
+
+Add plugin configuration or configurations (can receive an array of configurations too). Each configuration must have the next properties:
+* `pluginPackageName` `<string>` Package name of the plugin for which the configuration is destined.
+* `config` `<object>` Object containing the plugin configuration. Its format depends of each specific plugin configuration requisites.
+
+```js
+dmpcModule.addPluginConfig({
+  pluginPackageName: 'homebridge-domapic-plugin',
+  config: {
+    foo: 'foo-plugin-config'
+  }
+})
+```
 
 ## Plugins
 
@@ -281,6 +304,9 @@ All available events are:
 * service:created
 * service:updated
 * service:deleted
+* servicePluginConfig:created
+* servicePluginConfig:updated
+* servicePluginConfig:deleted
 * user:created
 * user:updated
 * user:deleted
@@ -308,9 +334,13 @@ A Domapic Plugin provides an interface that allows to perform operations into th
 * `users` - Interface for Controller's "user" entities:
 	* `me()` - Returns data about plugin user
 	* `get([id][,filter])` - Returns users data. Because of security reasons, only "operator" users will be returned. Request can be filtered providing an specific user id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{name:'foo-name'}`).
-	* `create(userData)` - Creates and user, and returns the new `id`. Only creating users with "operator" role is supported.
+	* `create(userData)` - Creates an user, and returns the new `id`. Only creating users with "operator" role is supported.
 * `services`- Interface for Controller's "service" entities:
 	* `get([id][,filter])` - Returns services data. Request can be filtered providing an specific service id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{type:'module'}`).
+* `servicePluginConfigs`- Interface for Controller's "servicePluginConfigs" entities:
+  * `get([id][,filter])` - Returns servicePluginConfigs data. Request can be filtered providing an specific servicePluginConfig id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{service:'service-id', 'plugin-package-name': 'foo-plugin-package-name'}`).
+  * `create(configData)` - Creates a service plugin configuratin, and returns the new `id`.
+  * `update(id, configData)` - Updates an specific service plugin configuration.
 * `abilities`- Interface for Controller's "ability" entities:
 	* `get([id][,filter])` - Returns abilities data. Request can be filtered providing an specific ability id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{service:'foo-module-id'}`).
 	* `state(id)` - Returns state of provided ability.

@@ -10,6 +10,7 @@ test.describe('plugin controller interface and events', function () {
   let consoleServiceId
   let consoleAbilityId
   let consoleNoDataAbilityId
+  let servicePluginConfigId
 
   const requestController = (entity, operation, options = {}) => {
     const body = {
@@ -115,6 +116,122 @@ test.describe('plugin controller interface and events', function () {
           test.expect(response.body.length).to.equal(2),
           test.expect(plugin).to.not.be.undefined(),
           test.expect(console).to.not.be.undefined()
+        ])
+      })
+    })
+  })
+
+  test.describe('controller interface for service plugin configurations', () => {
+    test.it('should create service plugin configurations', () => {
+      return requestController('servicePluginConfigs', 'create', {
+        data: {
+          _service: consoleServiceId,
+          pluginPackageName: 'foo-domapic-plugin-event-test',
+          config: {
+            foo: 'foo-config'
+          }
+        }
+      }).then(response => {
+        console.log(consoleServiceId)
+        console.log(response.body)
+        servicePluginConfigId = response.body._id
+        return test.expect(response.statusCode).to.equal(200)
+      })
+    })
+
+    test.it('should have received an event from controller about created service plugin configuration', () => {
+      return utils.serviceLogs(500)
+        .then(logs => {
+          return test.expect(logs).to.contain(`Received servicePluginConfig:created event. Data: {"_id":"${servicePluginConfigId}","_service":"${consoleServiceId}","pluginPackageName":"foo-domapic-plugin-event-test"`)
+        })
+    })
+
+    test.it('should update service plugin configuration', () => {
+      return requestController('servicePluginConfigs', 'update', {
+        id: servicePluginConfigId,
+        data: {
+          config: {
+            foo: 'foo-config-2'
+          }
+        }
+      }).then(response => {
+        return test.expect(response.statusCode).to.equal(200)
+      })
+    })
+
+    test.it('should have received an event from controller about updated service plugin configuration', () => {
+      return utils.serviceLogs(500)
+        .then(logs => {
+          return Promise.all([
+            test.expect(logs).to.contain(`Received servicePluginConfig:updated event`),
+            test.expect(logs).to.contain(`"config":{"foo":"foo-config-2"}`)
+          ])
+        })
+    })
+
+    test.it('should retrieve service plugin configurations', () => {
+      return requestController('servicePluginConfigs', 'get').then(response => {
+        const pluginConfig = response.body.find(configuration => configuration.pluginPackageName === 'foo-domapic-plugin-event-test')
+        return Promise.all([
+          test.expect(response.statusCode).to.equal(200),
+          test.expect(response.body.length).to.equal(2),
+          test.expect(pluginConfig._service).to.equal(consoleServiceId),
+          test.expect(pluginConfig._id).to.equal(servicePluginConfigId)
+        ])
+      })
+    })
+
+    test.it('should retrieve service plugin configurations filtering by plugin package name', () => {
+      return requestController('servicePluginConfigs', 'create', {
+        data: {
+          _service: consoleServiceId,
+          pluginPackageName: 'foo-domapic-plugin-event-test-2',
+          config: {
+            foo: 'foo-config-3'
+          }
+        }
+      }).then(response => {
+        return requestController('servicePluginConfigs', 'get', {
+          filter: {
+            'plugin-package-name': 'foo-domapic-plugin-event-test'
+          }
+        }).then(response => {
+          const pluginConfig = response.body.find(configuration => configuration.pluginPackageName === 'foo-domapic-plugin-event-test')
+          return Promise.all([
+            test.expect(response.statusCode).to.equal(200),
+            test.expect(response.body.length).to.equal(1),
+            test.expect(pluginConfig._service).to.equal(consoleServiceId),
+            test.expect(pluginConfig._id).to.equal(servicePluginConfigId)
+          ])
+        })
+      })
+    })
+
+    test.it('should retrieve service plugin configurations filtering by service id', () => {
+      return requestController('servicePluginConfigs', 'get', {
+        filter: {
+          service: consoleServiceId
+        }
+      }).then(response => {
+        const pluginConfig = response.body.find(configuration => configuration.pluginPackageName === 'foo-domapic-plugin-event-test')
+        return Promise.all([
+          test.expect(response.statusCode).to.equal(200),
+          test.expect(response.body.length).to.equal(3),
+          test.expect(pluginConfig._service).to.equal(consoleServiceId),
+          test.expect(pluginConfig._id).to.equal(servicePluginConfigId)
+        ])
+      })
+    })
+
+    test.it('should retrieve service plugin configuration', () => {
+      return requestController('servicePluginConfigs', 'get', {
+        id: servicePluginConfigId
+      }).then(response => {
+        const pluginConfig = response.body
+        return Promise.all([
+          test.expect(response.statusCode).to.equal(200),
+          test.expect(pluginConfig._service).to.equal(consoleServiceId),
+          test.expect(pluginConfig._id).to.equal(servicePluginConfigId)
         ])
       })
     })
