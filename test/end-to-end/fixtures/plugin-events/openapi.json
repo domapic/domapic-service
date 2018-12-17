@@ -12,12 +12,12 @@
           "entity": {
             "description": "Controller entity",
             "type": "string",
-            "enum": ["users", "services", "abilities", "logs"]
+            "enum": ["users", "services", "abilities", "logs", "servicePluginConfigs"]
           },
           "operation": {
             "description": "Entity operation",
             "type": "string",
-            "enum": ["me", "get", "create", "state", "action"]
+            "enum": ["me", "get", "create", "update", "state", "action"]
           },
           "id": {
             "description": "Entity id",
