@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 ### Removed
 
+## [1.0.0-alpha.5] - 2018-12-17
+### Added
+- Add servicePluginConfigs client
+- Add servicePluginConfigs events tests
+- Add "addPluginConfig" method. Register plugin configurations on service connection.
+
+### Changed
+- Upgrade domapic-controller version in end-to-end tests.
+
 ## [1.0.0-alpha.4] - 2018-12-09
 ### Added
 - Expose errors constructors to services
