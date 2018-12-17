@@ -126,12 +126,14 @@ test.describe('plugin controller interface and events', function () {
       return requestController('servicePluginConfigs', 'create', {
         data: {
           _service: consoleServiceId,
-          pluginPackageName: 'foo-domapic-plugin',
+          pluginPackageName: 'foo-domapic-plugin-event-test',
           config: {
             foo: 'foo-config'
           }
         }
       }).then(response => {
+        console.log(consoleServiceId)
+        console.log(response.body)
         servicePluginConfigId = response.body._id
         return test.expect(response.statusCode).to.equal(200)
       })
@@ -140,7 +142,7 @@ test.describe('plugin controller interface and events', function () {
     test.it('should have received an event from controller about created service plugin configuration', () => {
       return utils.serviceLogs(500)
         .then(logs => {
-          return test.expect(logs).to.contain(`Received servicePluginConfig:created event. Data: {"_id":"${servicePluginConfigId}","_service":"${consoleServiceId}","pluginPackageName":"foo-domapic-plugin"`)
+          return test.expect(logs).to.contain(`Received servicePluginConfig:created event. Data: {"_id":"${servicePluginConfigId}","_service":"${consoleServiceId}","pluginPackageName":"foo-domapic-plugin-event-test"`)
         })
     })
 
@@ -169,10 +171,10 @@ test.describe('plugin controller interface and events', function () {
 
     test.it('should retrieve service plugin configurations', () => {
       return requestController('servicePluginConfigs', 'get').then(response => {
-        const pluginConfig = response.body.find(configuration => configuration.pluginPackageName === 'foo-domapic-plugin')
+        const pluginConfig = response.body.find(configuration => configuration.pluginPackageName === 'foo-domapic-plugin-event-test')
         return Promise.all([
           test.expect(response.statusCode).to.equal(200),
-          test.expect(response.body.length).to.equal(1),
+          test.expect(response.body.length).to.equal(2),
           test.expect(pluginConfig._service).to.equal(consoleServiceId),
           test.expect(pluginConfig._id).to.equal(servicePluginConfigId)
         ])
@@ -183,7 +185,7 @@ test.describe('plugin controller interface and events', function () {
       return requestController('servicePluginConfigs', 'create', {
         data: {
           _service: consoleServiceId,
-          pluginPackageName: 'foo-domapic-plugin-2',
+          pluginPackageName: 'foo-domapic-plugin-event-test-2',
           config: {
             foo: 'foo-config-3'
           }
@@ -191,10 +193,10 @@ test.describe('plugin controller interface and events', function () {
       }).then(response => {
         return requestController('servicePluginConfigs', 'get', {
           filter: {
-            'plugin-package-name': 'foo-domapic-plugin'
+            'plugin-package-name': 'foo-domapic-plugin-event-test'
           }
         }).then(response => {
-          const pluginConfig = response.body.find(configuration => configuration.pluginPackageName === 'foo-domapic-plugin')
+          const pluginConfig = response.body.find(configuration => configuration.pluginPackageName === 'foo-domapic-plugin-event-test')
           return Promise.all([
             test.expect(response.statusCode).to.equal(200),
             test.expect(response.body.length).to.equal(1),
@@ -211,10 +213,10 @@ test.describe('plugin controller interface and events', function () {
           service: consoleServiceId
         }
       }).then(response => {
-        const pluginConfig = response.body.find(configuration => configuration.pluginPackageName === 'foo-domapic-plugin')
+        const pluginConfig = response.body.find(configuration => configuration.pluginPackageName === 'foo-domapic-plugin-event-test')
         return Promise.all([
           test.expect(response.statusCode).to.equal(200),
-          test.expect(response.body.length).to.equal(2),
+          test.expect(response.body.length).to.equal(3),
           test.expect(pluginConfig._service).to.equal(consoleServiceId),
           test.expect(pluginConfig._id).to.equal(servicePluginConfigId)
         ])
