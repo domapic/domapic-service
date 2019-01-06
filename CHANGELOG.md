@@ -10,6 +10,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 ### Removed
 
+## [1.0.0-beta.1] - 2019-01-06
+### BREAKING CHANGES
+- From now, connection process not compatible with Domapic Controller versions lower than 1.0.0-alpha.14.
+
+### Changed
+- Send service name and ability service on connection process. Now connection works even when authentication is disabled.
+- Upgrade domapic-controller version in end-to-end tests.
+- Upgrade domapic-base version.
+
 ## [1.0.0-alpha.5] - 2018-12-17
 ### Added
 - Add servicePluginConfigs client

@@ -1,6 +1,6 @@
 {
   "name": "domapic-service",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0-beta.1",
   "description": "Base for Domapic Node.js services",
   "main": "index.js",
   "keywords": [
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "bluebird": "3.5.3",
-    "domapic-base": "1.0.0-beta.18",
+    "domapic-base": "1.0.0-beta.19",
     "is-promise": "2.1.0",
     "lodash": "4.17.11",
     "rand-token": "0.4.0",
