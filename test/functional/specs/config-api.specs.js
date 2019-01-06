@@ -27,6 +27,7 @@ test.describe('config api', function () {
           port: parseInt(utils.SERVICE_PORT, 10),
           initialStatus: true,
           authDisabled: [],
+          auth: true,
           hostName: utils.SERVICE_HOST,
           path: path.resolve(__dirname, '..', '..', '..', utils.DOMAPIC_PATH),
           rejectUntrusted: false,
