@@ -86,6 +86,14 @@ schemas:
             fixture: console
             domapic_path: .test
             db_uri: mongodb://localhost:27017/domapic
+      controller-auth-disabled: &e2e-controller-service-auth-disabled
+        name: controller
+        docker:
+          <<: *e2e-controller-service-docker
+          command: test/end-to-end/commands/start-controller-auth-disabled.sh
+        local:
+          <<: *e2e-controller-service-local
+          command: test/end-to-end/commands/start-controller-auth-disabled.sh
       service: &e2e-service-service
         name: service
         docker: &e2e-service-service-docker
@@ -112,6 +120,14 @@ schemas:
             service_name: console
             fixture: console
             domapic_path: .test
+      service-auth-disabled: &e2e-service-service-auth-disabled
+        name: service
+        docker:
+          <<: *e2e-service-service-docker
+          command: test/end-to-end/commands/start-service-auth-disabled.sh
+        local:
+          <<: *e2e-service-service-local
+          command: test/end-to-end/commands/start-service-auth-disabled.sh
       test: &e2e-test
         local: &e2e-test-local
           wait-on:
@@ -315,6 +331,7 @@ suites:
           - test/functional/specs/ability-string.specs.js
           - test/functional/specs/ability-string-enum.specs.js
           - test/functional/specs/ability-number.specs.js
+          - test/functional/specs/ability-number-decimal.specs.js
           - test/functional/specs/ability-number-enum.specs.js
           - test/functional/specs/ability-no-data.specs.js
       coverage: *disable-coverage
@@ -477,6 +494,37 @@ suites:
           - test/functional/plugin-specs/config-api.specs.js
       coverage: *disable-coverage
   end-to-end:
+    - name: service-connection-authentication-disabled
+      describe: Service should connect to controller when started first time if authentication is disabled in controller
+      before: *e2e-clean
+      services:
+        - *e2e-mongodb-service
+        - *e2e-controller-service-auth-disabled
+        - *e2e-service-service-auth-disabled
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/specs/console-registered.specs.js
+          - test/end-to-end/specs/console-plugin-config-registered.specs.js
+          - test/end-to-end/specs/controller-action-handler.specs.js
+          - test/end-to-end/specs/controller-state-handler.specs.js
+      coverage: *disable-coverage
+    - name: service-reconnection-after-auth-disabled
+      describe: Service should connect to controller when started after connecting with auth disabled
+      services:
+        - *e2e-mongodb-service
+        - *e2e-controller-service
+        - *e2e-service-service
+      test:
+        <<: *e2e-test
+        specs:
+          - test/end-to-end/specs/service-connection.specs.js
+          - test/end-to-end/specs/console-registered.specs.js
+          - test/end-to-end/specs/console-plugin-config-registered.specs.js
+          - test/end-to-end/specs/controller-action-handler.specs.js
+          - test/end-to-end/specs/controller-state-handler.specs.js
+      coverage: *disable-coverage
     - name: service-connection
       describe: Service should connect to controller when started first time if connection options are provided
       before: *e2e-clean

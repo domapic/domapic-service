@@ -141,6 +141,24 @@ domapic.createModule({
         }
       }
     },
+    numericDecimalConsole: {
+      description: 'Handle numeric enum console logs',
+      data: {
+        type: 'number',
+        minimum: 10,
+        maximum: 40
+      },
+      event: {
+        description: 'Console has just printed a decimal number'
+      },
+      action: {
+        description: 'Print the received decimal number into console',
+        handler: (data) => {
+          consoleLog(data, 'numericDecimalConsole')
+          return Promise.resolve(data)
+        }
+      }
+    },
     noDataConsole: {
       description: 'Prints hello into console',
       event: {
