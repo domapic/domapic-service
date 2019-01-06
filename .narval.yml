@@ -315,6 +315,7 @@ suites:
           - test/functional/specs/ability-string.specs.js
           - test/functional/specs/ability-string-enum.specs.js
           - test/functional/specs/ability-number.specs.js
+          - test/functional/specs/ability-number-decimal.specs.js
           - test/functional/specs/ability-number-enum.specs.js
           - test/functional/specs/ability-no-data.specs.js
       coverage: *disable-coverage
