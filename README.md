@@ -141,7 +141,7 @@ Each ability must be an object, which key will be the name of the ability (will 
 
 * `description` `<string>` Description of the ability.
 * `data` `<object>` Defines the type of data that the ability will handle, and will be used to execute data validation for the action, state and event related api resources. If the ability don't needs any type of data, this property should be omitted (in that case, the ability can't have an state, because it has no sense).
-	* `type` `<string>` Type of data. Can be one of `string`, `boolean`, `number`, `integer` or `float`
+	* `type` `<string>` Type of data. Can be one of `string`, `boolean`, `number`
 	* `enum` `<array>` Used to restrict data to a fixed set of values. It must be an array with at least one element, where each element is unique.
 	* `minLength` `<number>` Minimum length of the data string.
 	* `maxLength` `<number>` Maximum length of the data string.
@@ -327,28 +327,38 @@ Wildcards are available for subscribing to all events of an specific `entity`, o
 * `service:*` - All events of "service" entity.
 * `*:created` - All operations "created" of any entity.
 
-### Controller interface
+### Controller api client
 
-A Domapic Plugin provides an interface that allows to perform operations into the Controller. All methods returns a Promise, and are available under the `plugin.controller` object, which contains:
+A Domapic Plugin provides an api client that allows to perform operations into the Controller. All methods returns a Promise, and are available under the `plugin.controller` object, which contains:
 
 * `users` - Interface for Controller's "user" entities:
 	* `me()` - Returns data about plugin user
-	* `get([id][,filter])` - Returns users data. Because of security reasons, only "operator" users will be returned. Request can be filtered providing an specific user id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{name:'foo-name'}`).
+	* `get([id][,filter])` - Returns users data. Because of security reasons, only "operator" users are allowed to be returned until plugin has "adminPermissions". For plugins without admin permissions granted, request must be filtered providing a role filter as `{role:'operator'}`. Extra filters can be provided too, id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{name:'foo-name'}`).
 	* `create(userData)` - Creates an user, and returns the new `id`. Only creating users with "operator" role is supported.
 * `services`- Interface for Controller's "service" entities:
 	* `get([id][,filter])` - Returns services data. Request can be filtered providing an specific service id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{type:'module'}`).
 * `servicePluginConfigs`- Interface for Controller's "servicePluginConfigs" entities:
-  * `get([id][,filter])` - Returns servicePluginConfigs data. Request can be filtered providing an specific servicePluginConfig id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{service:'service-id', 'plugin-package-name': 'foo-plugin-package-name'}`).
-  * `create(configData)` - Creates a service plugin configuratin, and returns the new `id`.
-  * `update(id, configData)` - Updates an specific service plugin configuration.
+	* `get([id][,filter])` - Returns servicePluginConfigs data. Request can be filtered providing an specific servicePluginConfig id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{service:'service-id', 'plugin-package-name': 'foo-plugin-package-name'}`).
+	* `create(configData)` - Creates a service plugin configuratin, and returns the new `id`.
+	* `update(id, configData)` - Updates an specific service plugin configuration.
 * `abilities`- Interface for Controller's "ability" entities:
 	* `get([id][,filter])` - Returns abilities data. Request can be filtered providing an specific ability id as \<String\>, or an \<Object\> containing any other api supported filter (such as `{service:'foo-module-id'}`).
 	* `state(id)` - Returns state of provided ability.
 	* `action(id, data)` - Dispatches ability action with provided data.
 * `logs` - Interface for Controller's "log" entity:
-	* `get()` - Returns Controller logs with all modules' actions and events.
+	* `get([filter])` - Returns Controller logs with all modules' actions and events. A query filter can be provided.
+* `config` - Interface for Controller's configuration. 
+	* `get()` - Returns Controller configuration.
+* `apiKeys` - Interface for Controller's "securityTokens" entity, filtered by "apiKey" type. For security reasons, only plugins with admin permissions granted can access to this resource, otherwise requests will return a forbidden error.
+	* `get()` - Returns Controller user's api keys.
+	* `create(userData)` - Creates an api key for the given user, and returns it.
 
 Consult the Controller Swagger interface to get more info about supported filters (queries) and requested data for each api interface.
+
+### Security in plugins
+
+Plugins are registered into the Controller with a "plugin" role, that, for security reasons, can't perform certain types of operations and have limited access to some resources, such as security tokens, etc.
+Depending of the plugin behavior, it may need accessing to this resources to can work. If a plugin need special permissions to work, you can use the Controller web interface to modify it, and check the "grant admin permissions" option.
 
 ## Start the server
 
