@@ -137,8 +137,6 @@ test.describe('plugin controller interface and events', function () {
           }
         }
       }).then(response => {
-        console.log(consoleServiceId)
-        console.log(response.body)
         servicePluginConfigId = response.body._id
         return test.expect(response.statusCode).to.equal(200)
       })
@@ -379,8 +377,6 @@ test.describe('plugin controller interface and events', function () {
             adminPermissions: true
           }
         }).then(response => {
-          console.log("RESPONSE modifying plugin admin permissions")
-          console.log(response)
           return Promise.resolve()
         })
       })
@@ -412,7 +408,7 @@ test.describe('plugin controller interface and events', function () {
           const noOperator = response.body.find(user => user.role !== 'operator')
           return Promise.all([
             test.expect(response.statusCode).to.equal(200),
-            test.expect(response.body.length).to.equal(1),
+            test.expect(response.body.length).to.equal(6),
             test.expect(noOperator).to.not.be.undefined()
           ])
         })
