@@ -85,8 +85,10 @@ test.describe('plugin controller interface and events', function () {
   test.describe('controller interface for getting users', () => {
     test.it('should return user when passing id', () => {
       return requestController('users', 'get', {
-        role: 'operator',
-        id: userId
+        filter: {
+          role: 'operator',
+          id: userId
+        }
       }).then(response => {
         return Promise.all([
           test.expect(response.statusCode).to.equal(200),
@@ -377,6 +379,10 @@ test.describe('plugin controller interface and events', function () {
           body: {
             adminPermissions: true
           }
+        }).then(response => {
+          console.log("RESPONSE modifying plugin admin permissions")
+          console.log(response)
+          return Promise.resolve()
         })
       })
     })
@@ -391,6 +397,17 @@ test.describe('plugin controller interface and events', function () {
     })
 
     test.describe('controller interface for getting users', () => {
+      test.it('should return user when passing id', () => {
+        return requestController('users', 'get', {
+          id: userId
+        }).then(response => {
+          return Promise.all([
+            test.expect(response.statusCode).to.equal(200),
+            test.expect(response.body._id).to.equal(userId)
+          ])
+        })
+      })
+
       test.it('should return all users when no passing role filter', () => {
         return requestController('users', 'get').then(response => {
           const noOperator = response.body.find(user => user.role !== 'operator')
