@@ -58,6 +58,7 @@ test.describe('plugin controller interface and events', function () {
     test.it('should return id of created user', () => {
       return requestController('users', 'create', {
         data: {
+          role: 'operator',
           name: 'foo-operator-name',
           email: 'foo-operator-email@foo-email.com',
           password: 'foo-operator-password'
@@ -84,6 +85,7 @@ test.describe('plugin controller interface and events', function () {
   test.describe('controller interface for getting users', () => {
     test.it('should return user when passing id', () => {
       return requestController('users', 'get', {
+        role: 'operator',
         id: userId
       }).then(response => {
         return Promise.all([
@@ -93,8 +95,10 @@ test.describe('plugin controller interface and events', function () {
       })
     })
 
-    test.it('should return all operator users when no passing filter', () => {
-      return requestController('users', 'get').then(response => {
+    test.it('should return all operator users passing role filter', () => {
+      return requestController('users', 'get', {
+        role: 'operator'
+      }).then(response => {
         const noOperator = response.body.find(user => user.role !== 'operator')
         return Promise.all([
           test.expect(response.statusCode).to.equal(200),
