@@ -85,10 +85,7 @@ test.describe('plugin controller interface and events', function () {
   test.describe('controller interface for getting users', () => {
     test.it('should return user when passing id', () => {
       return requestController('users', 'get', {
-        filter: {
-          role: 'operator',
-          id: userId
-        }
+        id: userId
       }).then(response => {
         return Promise.all([
           test.expect(response.statusCode).to.equal(200),
@@ -99,7 +96,9 @@ test.describe('plugin controller interface and events', function () {
 
     test.it('should return all operator users when passing role filter', () => {
       return requestController('users', 'get', {
-        role: 'operator'
+        filter: {
+          role: 'operator'
+        }
       }).then(response => {
         const noOperator = response.body.find(user => user.role !== 'operator')
         return Promise.all([
@@ -374,7 +373,7 @@ test.describe('plugin controller interface and events', function () {
       controllerConnection = new utils.ControllerConnection()
       return requestController('users', 'me').then(response => {
         id = response.body._id
-        return controllerConnection.request(`users/${id}`, {
+        return controllerConnection.request(`/users/${id}`, {
           method: 'patch',
           body: {
             adminPermissions: true
@@ -388,7 +387,7 @@ test.describe('plugin controller interface and events', function () {
     })
 
     test.after(() => {
-      return controllerConnection.request(`users/${id}`, {
+      return controllerConnection.request(`/users/${id}`, {
         method: 'patch',
         body: {
           adminPermissions: false
