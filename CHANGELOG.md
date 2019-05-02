@@ -13,12 +13,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [1.0.0-beta.2] - 2019-05-02
 ### BREAKING CHANGES
 - Ability data types "integer" and "float" are deprecated in favour of using only "number".
+- getUsers method in controller api client now request all users by default. This will result in a forbidden response if plugin has not admin permissions granted. For requesting only operator users, which is allowed to all plugins, a role filter has to be provided.
 
 ### Added
 - Add config and apiKeys methods to Controller api Client.
-
-### Changed
-- getUsers method in controller api client now request all users by default. This will result in a forbidden response if plugin has not admin permissions granted. For requesting only operator users a filter has to be provided.
 
 ## [1.0.0-beta.1] - 2019-01-06
 ### BREAKING CHANGES
