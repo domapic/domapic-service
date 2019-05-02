@@ -1,6 +1,6 @@
 {
   "name": "domapic-service",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "Base for Domapic Node.js services",
   "main": "index.js",
   "keywords": [
@@ -22,13 +22,17 @@
     "process manager",
     "swagger-ui"
   ],
+  "files": [
+    "index.js",
+    "/lib"
+  ],
   "scripts": {
     "test": "narval",
     "coveralls": "cat ./.coverage/unit/lcov.info | coveralls"
   },
   "dependencies": {
-    "bluebird": "3.5.3",
-    "domapic-base": "1.0.0-beta.19",
+    "bluebird": "3.5.4",
+    "domapic-base": "1.0.0-beta.20",
     "is-promise": "2.1.0",
     "lodash": "4.17.11",
     "rand-token": "0.4.0",
@@ -37,9 +41,9 @@
     "ip": "1.1.5"
   },
   "devDependencies": {
-    "coveralls": "3.0.2",
-    "request-promise": "4.2.2",
-    "request": "2.87.0",
+    "coveralls": "3.0.3",
+    "request-promise": "4.2.4",
+    "request": "2.88.0",
     "narval": "2.2.1"
   },
   "author": {

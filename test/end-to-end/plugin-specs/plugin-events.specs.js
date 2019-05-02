@@ -58,6 +58,7 @@ test.describe('plugin controller interface and events', function () {
     test.it('should return id of created user', () => {
       return requestController('users', 'create', {
         data: {
+          role: 'operator',
           name: 'foo-operator-name',
           email: 'foo-operator-email@foo-email.com',
           password: 'foo-operator-password'
@@ -93,8 +94,12 @@ test.describe('plugin controller interface and events', function () {
       })
     })
 
-    test.it('should return all operator users when no passing filter', () => {
-      return requestController('users', 'get').then(response => {
+    test.it('should return all operator users when passing role filter', () => {
+      return requestController('users', 'get', {
+        filter: {
+          role: 'operator'
+        }
+      }).then(response => {
         const noOperator = response.body.find(user => user.role !== 'operator')
         return Promise.all([
           test.expect(response.statusCode).to.equal(200),
@@ -132,8 +137,6 @@ test.describe('plugin controller interface and events', function () {
           }
         }
       }).then(response => {
-        console.log(consoleServiceId)
-        console.log(response.body)
         servicePluginConfigId = response.body._id
         return test.expect(response.statusCode).to.equal(200)
       })
@@ -356,6 +359,59 @@ test.describe('plugin controller interface and events', function () {
           test.expect(actionNoData.data).to.be.undefined(),
           test.expect(eventNoData.data).to.be.undefined()
         ])
+      })
+    })
+  })
+
+  test.describe('controller interface when plugin has admin permissions', () => {
+    let controllerConnection
+    let id
+
+    test.before(() => {
+      controllerConnection = new utils.ControllerConnection()
+      return requestController('users', 'me').then(response => {
+        id = response.body._id
+        return controllerConnection.request(`/users/${id}`, {
+          method: 'patch',
+          body: {
+            adminPermissions: true
+          }
+        }).then(response => {
+          return Promise.resolve()
+        })
+      })
+    })
+
+    test.after(() => {
+      return controllerConnection.request(`/users/${id}`, {
+        method: 'patch',
+        body: {
+          adminPermissions: false
+        }
+      })
+    })
+
+    test.describe('controller interface for getting users', () => {
+      test.it('should return user when passing id', () => {
+        return requestController('users', 'get', {
+          id: userId
+        }).then(response => {
+          return Promise.all([
+            test.expect(response.statusCode).to.equal(200),
+            test.expect(response.body._id).to.equal(userId)
+          ])
+        })
+      })
+
+      test.it('should return all users when no passing role filter', () => {
+        return requestController('users', 'get').then(response => {
+          const noOperator = response.body.find(user => user.role !== 'operator')
+          return Promise.all([
+            test.expect(response.statusCode).to.equal(200),
+            test.expect(response.body.length).to.equal(6),
+            test.expect(noOperator).to.not.be.undefined()
+          ])
+        })
       })
     })
   })

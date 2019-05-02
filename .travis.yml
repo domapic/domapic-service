@@ -33,4 +33,4 @@ addons:
 script:
   - npm test
   - npm run coveralls
-  - sonar-scanner
+  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then sonar-scanner; fi'
