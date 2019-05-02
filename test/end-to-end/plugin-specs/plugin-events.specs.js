@@ -95,7 +95,7 @@ test.describe('plugin controller interface and events', function () {
       })
     })
 
-    test.it('should return all operator users passing role filter', () => {
+    test.it('should return all operator users when passing role filter', () => {
       return requestController('users', 'get', {
         role: 'operator'
       }).then(response => {
@@ -360,6 +360,46 @@ test.describe('plugin controller interface and events', function () {
           test.expect(actionNoData.data).to.be.undefined(),
           test.expect(eventNoData.data).to.be.undefined()
         ])
+      })
+    })
+  })
+
+  test.describe('controller interface when plugin has admin permissions', () => {
+    let controllerConnection
+    let id
+
+    test.before(() => {
+      controllerConnection = new utils.ControllerConnection()
+      return requestController('users', 'me').then(response => {
+        id = response.body._id
+        return controllerConnection.request(`users/${id}`, {
+          method: 'patch',
+          body: {
+            adminPermissions: true
+          }
+        })
+      })
+    })
+
+    test.after(() => {
+      return controllerConnection.request(`users/${id}`, {
+        method: 'patch',
+        body: {
+          adminPermissions: false
+        }
+      })
+    })
+
+    test.describe('controller interface for getting users', () => {
+      test.it('should return all users when no passing role filter', () => {
+        return requestController('users', 'get').then(response => {
+          const noOperator = response.body.find(user => user.role !== 'operator')
+          return Promise.all([
+            test.expect(response.statusCode).to.equal(200),
+            test.expect(response.body.length).to.equal(1),
+            test.expect(noOperator).to.not.be.undefined()
+          ])
+        })
       })
     })
   })

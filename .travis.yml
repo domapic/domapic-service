@@ -31,6 +31,6 @@ addons:
       name: "$TRAVIS_CURRENT_BRANCH"
 
 script:
-  - npm test
+  - npm test -- --suite=plugin-events --logLevel=trace
   - npm run coveralls
   - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then sonar-scanner; fi'
