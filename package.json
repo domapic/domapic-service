@@ -22,6 +22,10 @@
     "process manager",
     "swagger-ui"
   ],
+  "files": [
+    "index.js",
+    "lib"
+  ],
   "scripts": {
     "test": "narval",
     "coveralls": "cat ./.coverage/unit/lcov.info | coveralls"
